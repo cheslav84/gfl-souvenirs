@@ -7,6 +7,7 @@ import lombok.Setter;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -34,14 +35,41 @@ public class Producer implements Cloneable {
         this.souvenirs = new ArrayList<>();
     }
 
-    public Producer (Producer producer) {
+    public Producer(Producer producer) {
         this.id = producer.getId();
         this.name = producer.getName();
         this.country = producer.getCountry();
         this.souvenirs = producer.souvenirs.stream()
-                .map(s -> new Souvenir(s.getId()))
+                .map(s -> {
+                    Souvenir sv = new Souvenir();
+                    sv.setId(s.getId());
+                    return sv;
+                })//todo ризик нарватись на NPE. Подумати, можливо огорнути в try/catch
                 .collect(Collectors.toList());
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
 
+        Producer producer = (Producer) o;
+
+        if (!Objects.equals(id, producer.id)) return false;
+        if (!Objects.equals(name, producer.name)) return false;
+        if (!Objects.equals(country, producer.country)) return false;
+
+
+        return true;
+//        return Objects.equals(souvenirs, producer.souvenirs);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (country != null ? country.hashCode() : 0);
+//        result = 31 * result + (souvenirs != null ? souvenirs.hashCode() : 0);
+        return result;
+    }
 }
