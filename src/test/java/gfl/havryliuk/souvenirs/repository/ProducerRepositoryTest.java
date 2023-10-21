@@ -4,11 +4,15 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
+import gfl.havryliuk.souvenirs.util.StorageProperties;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
+import org.mockito.Mock;
+import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
+import org.testng.annotations.Listeners;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,11 +20,14 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.testng.Assert.*;
+import static org.mockito.Mockito.when;
 
+@Listeners(MockitoTestNGListener.class)
 public class ProducerRepositoryTest {
-
-    private static final File PRODUCERS = new File("src/test/java/data/Producers.json");
+    @Mock
+    private StorageProperties storageProperties;
+    private static final String PATH = "src/test/java/data/Test.json";
+    private static final File PRODUCERS = new File(PATH);
     private final ObjectMapper mapper = Mapper.getObjectMapper();
     private ProducerRepository repository;
 
@@ -28,15 +35,15 @@ public class ProducerRepositoryTest {
 
     @BeforeMethod
     public void setUp() {
+        when(storageProperties.getProducersPathStorage()).thenReturn(PATH);
         new Document<Producer>().create(PRODUCERS);
-        repository = new ProducerRepository(PRODUCERS);
+        repository = new ProducerRepository(storageProperties);
     }
 
     @AfterMethod
     public void tearDown() {
         PRODUCERS.deleteOnExit();
     }
-
 
 
     @Test

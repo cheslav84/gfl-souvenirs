@@ -5,10 +5,14 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
+import gfl.havryliuk.souvenirs.util.StorageProperties;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
+import org.mockito.Mock;
+import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 
 import java.io.File;
@@ -17,18 +21,23 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.when;
 
+@Listeners(MockitoTestNGListener.class)
 public class SouvenirRepositoryTest {
-
-    private static final File SOUVENIRS = new File("src/test/java/data/Souvenirs.json");
+    @Mock
+    private StorageProperties storageProperties;
+    private static final String PATH = "src/test/java/data/Test.json";
+    private static final File SOUVENIRS = new File(PATH);
     private final ObjectMapper mapper = Mapper.getObjectMapper();
     private SouvenirRepository repository;
 
 
     @BeforeMethod
     public void setUp() {
+        when(storageProperties.getSouvenirsPathStorage()).thenReturn(PATH);
         new Document<Souvenir>().create(SOUVENIRS);
-        repository = new SouvenirRepository(SOUVENIRS);
+        repository = new SouvenirRepository(storageProperties);
     }
 
     @AfterMethod

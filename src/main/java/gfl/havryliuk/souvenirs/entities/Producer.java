@@ -11,10 +11,11 @@ import java.util.Objects;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+
 @Getter
 @Setter
 @NoArgsConstructor
-public class Producer implements Cloneable {
+public class Producer {
 
 //    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
