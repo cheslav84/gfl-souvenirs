@@ -4,7 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.repository.storage.Storage;
+import gfl.havryliuk.souvenirs.repository.storage.ProducerStorage;
+import gfl.havryliuk.souvenirs.repository.storage.SouvenirStorage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -27,7 +28,11 @@ import static org.mockito.Mockito.when;
 @Listeners(MockitoTestNGListener.class)
 public class ProducerRepositoryTest {
     @Mock
-    private Storage storage;
+    private ProducerStorage producerStorage;
+
+    @Mock
+    private SouvenirStorage souvenirStorage;
+
     private static final String PRODUCERS_PATH = "src/test/java/data/Producers.json";
     private static final String SOUVENIR_PATH = "src/test/java/data/Souvenirs.json";
     private static final File PRODUCERS = new File(PRODUCERS_PATH);
@@ -35,11 +40,12 @@ public class ProducerRepositoryTest {
     private final ObjectMapper mapper = Mapper.getMapper();
     private ProducerRepository repository;
 
+
     @BeforeMethod
     public void setUp() {
-        when(storage.getProducerStorage()).thenReturn(PRODUCERS);
-        new Document<Producer>(storage).create(PRODUCERS);
-        repository = new ProducerRepository(storage);
+        when(producerStorage.getStorage()).thenReturn(PRODUCERS);
+        new Document<Producer>(producerStorage).create();
+        repository = new ProducerRepository(producerStorage, souvenirStorage);
     }
 
     @AfterMethod
@@ -194,10 +200,14 @@ public class ProducerRepositoryTest {
                 .flatMap(r -> r.getSouvenirs().stream())
                 .toList();
 
-        when(storage.getSouvenirsStorage()).thenReturn(SOUVENIRS);
-        new Document<Souvenir>(storage).create(SOUVENIRS);
-        SouvenirRepository souvenirRepository = new SouvenirRepository(storage);
+        SouvenirRepository souvenirRepository = initSouvenirRepository();
         souvenirRepository.saveAll(allSouvenirs);
+    }
+
+    private SouvenirRepository initSouvenirRepository() {
+        when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
+        new Document<Souvenir>(souvenirStorage).create();
+        return new SouvenirRepository(souvenirStorage);
     }
 
 

@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.repository.storage.Storage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
-import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -20,63 +19,52 @@ import static org.testng.Assert.assertTrue;
 
 public class DocumentTest {
 
-    @Mock
-    private Storage storage;
-    private static final File FILE = new File("src/test/java/data/Strings.json");
+    private static final File STORAGE = new File("src/test/java/data/Test.json");
+    private final ObjectMapper mapper = Mapper.getMapper();
     private Document<Producer> producers;
-    private ObjectMapper mapper;
 
 
     @BeforeMethod
     public void setUp() {
+        Storage storage = () -> STORAGE;
+        new Document<Producer>(storage).create();
         producers = new Document<>(storage);
-        mapper = Mapper.getMapper();
     }
 
     @AfterMethod
     public void tearDown() {
-        FILE.deleteOnExit();
+        STORAGE.deleteOnExit();
     }
 
 
     @Test
     public void testCreate() {
-        producers.create(FILE);
-        assertTrue(FILE.exists());
+        producers.create();
+        assertTrue(STORAGE.exists());
     }
-
 
 
     @Test
     public void testGetDocument() {
-        producers.create(FILE);
-        ArrayNode document = producers.getRecords(FILE);
+        producers.create();
+        ArrayNode document = producers.getRecords();
         assertTrue(document.isEmpty());
     }
-
 
 
     @Test
     public void testSaveDocument() throws IOException {
         Producer uaProducer = ProducerProvider.getProducer();
-
-        producers.create(FILE);
-        ArrayNode document = producers.getRecords(FILE);
+        producers.create();
+        ArrayNode document = producers.getRecords();
         document.add(mapper.valueToTree(uaProducer));
-        producers.saveRecords(FILE, document);
-
-        List<Producer> savedProducers = mapper.readValue(FILE, new TypeReference<>(){});
+        producers.saveRecords(document);
+        List<Producer> savedProducers = mapper.readValue(STORAGE, new TypeReference<>(){});
         Producer savedUaProducer = savedProducers.get(0);
 
         assertThat(savedProducers).size().isEqualTo(1);
         assertThat(savedUaProducer.getName()).isEqualTo(uaProducer.getName());
         assertThat(savedUaProducer.getCountry()).isEqualTo(uaProducer.getCountry());
-
     }
-
-
-
-
-
 
 }

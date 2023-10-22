@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.repository.storage.Storage;
+import gfl.havryliuk.souvenirs.repository.storage.SouvenirStorage;
 import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -26,7 +26,7 @@ import static org.mockito.Mockito.when;
 @Listeners(MockitoTestNGListener.class)
 public class SouvenirRepositoryTest {
     @Mock
-    private Storage storage;
+    private SouvenirStorage souvenirStorage;
     private static final String SOUVENIRS_PATH = "src/test/java/data/Souvenir.json";
     private static final File SOUVENIRS = new File(SOUVENIRS_PATH);
     private final ObjectMapper mapper = Mapper.getMapper();
@@ -35,9 +35,9 @@ public class SouvenirRepositoryTest {
 
     @BeforeMethod
     public void setUp() {
-        when(storage.getSouvenirsStorage()).thenReturn(SOUVENIRS);
-        new Document<Souvenir>(storage).create(SOUVENIRS);
-        repository = new SouvenirRepository(storage);
+        when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
+        new Document<Souvenir>(souvenirStorage).create();
+        repository = new SouvenirRepository(souvenirStorage);
     }
 
     @AfterMethod
