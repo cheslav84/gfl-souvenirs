@@ -3,15 +3,26 @@ package gfl.havryliuk.souvenirs.util.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
+import gfl.havryliuk.souvenirs.repository.storage.Storage;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Spliterator;
+
+
 
 public class Document<T> {
 
+    private Storage storage;
+
+    public Document(Storage storage) {
+        this.storage = storage;
+    }
+
+
     public void create(File file){
-        ObjectMapper mapper = Mapper.getObjectMapper();
+        ObjectMapper mapper = Mapper.getMapper();
         try {
             mapper.writeValue(file, new ArrayList<T>());
         } catch (IOException e) {
@@ -20,8 +31,8 @@ public class Document<T> {
     }
 
 
-    public ArrayNode getDocument (File file) {
-        ObjectMapper mapper = Mapper.getObjectMapper();
+    public ArrayNode getRecords(File file) {
+        ObjectMapper mapper = Mapper.getMapper();
         try {
             JsonNode rootNode = mapper.readTree(file);
             if (rootNode.isArray()) {
@@ -35,14 +46,21 @@ public class Document<T> {
     }
 
 
-    public void saveDocument(File file, ArrayNode node){
-        ObjectMapper mapper = Mapper.getObjectMapper();
+    public void saveRecords(File file, ArrayNode node){
+        ObjectMapper mapper = Mapper.getMapper();
         try {
             mapper.writeValue(file, node);
         } catch (IOException e) {
             throw new RuntimeException("Error saving document: " + file.getPath(), e);
         }
     }
+
+
+    public Spliterator<JsonNode> getSpliterator(File file) {
+
+        return this.getRecords(file).spliterator();//todo повторюється в класах
+    }
+
 
 
 

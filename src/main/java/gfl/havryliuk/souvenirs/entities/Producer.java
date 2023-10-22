@@ -1,10 +1,14 @@
 package gfl.havryliuk.souvenirs.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIdentityReference;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -26,7 +30,10 @@ public class Producer {
 //    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private String country;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+
+//    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
+//    @JsonIdentityReference(alwaysAsId=true)
+    @JsonIgnoreProperties(value = {"name", "price", "productionDate", "producer" }, allowSetters = true)
     private List<Souvenir> souvenirs;
 
     public Producer(String name, String country) {
@@ -34,19 +41,6 @@ public class Producer {
         this.name = name;
         this.country = country;
         this.souvenirs = new ArrayList<>();
-    }
-
-    public Producer(Producer producer) {
-        this.id = producer.getId();
-        this.name = producer.getName();
-        this.country = producer.getCountry();
-        this.souvenirs = producer.souvenirs.stream()
-                .map(s -> {
-                    Souvenir sv = new Souvenir();
-                    sv.setId(s.getId());
-                    return sv;
-                })//todo ризик нарватись на NPE. Подумати, можливо огорнути в try/catch
-                .collect(Collectors.toList());
     }
 
     @Override

@@ -3,8 +3,9 @@ package gfl.havryliuk.souvenirs.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gfl.havryliuk.souvenirs.entities.Producer;
+import gfl.havryliuk.souvenirs.entities.Souvenir;
+import gfl.havryliuk.souvenirs.repository.storage.Storage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
-import gfl.havryliuk.souvenirs.util.StorageProperties;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
 import org.mockito.Mock;
@@ -18,6 +19,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -25,31 +27,32 @@ import static org.mockito.Mockito.when;
 @Listeners(MockitoTestNGListener.class)
 public class ProducerRepositoryTest {
     @Mock
-    private StorageProperties storageProperties;
-    private static final String PATH = "src/test/java/data/Test.json";
-    private static final File PRODUCERS = new File(PATH);
-    private final ObjectMapper mapper = Mapper.getObjectMapper();
+    private Storage storage;
+    private static final String PRODUCERS_PATH = "src/test/java/data/Producers.json";
+    private static final String SOUVENIR_PATH = "src/test/java/data/Souvenirs.json";
+    private static final File PRODUCERS = new File(PRODUCERS_PATH);
+    private static final File SOUVENIRS = new File(SOUVENIR_PATH);
+    private final ObjectMapper mapper = Mapper.getMapper();
     private ProducerRepository repository;
-
-
 
     @BeforeMethod
     public void setUp() {
-        when(storageProperties.getProducersPathStorage()).thenReturn(PATH);
-        new Document<Producer>().create(PRODUCERS);
-        repository = new ProducerRepository(storageProperties);
+        when(storage.getProducerStorage()).thenReturn(PRODUCERS);
+        new Document<Producer>(storage).create(PRODUCERS);
+        repository = new ProducerRepository(storage);
     }
 
     @AfterMethod
     public void tearDown() {
         PRODUCERS.deleteOnExit();
+        SOUVENIRS.deleteOnExit();
     }
 
 
     @Test
     public void testSave() throws IOException {
         Producer uaProducer = ProducerProvider.getProducer();
-        Producer ukProducer = ProducerProvider.getProducerWithSouvenirs();
+        Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
 
         repository.save(uaProducer);
         repository.save(ukProducer);
@@ -76,14 +79,13 @@ public class ProducerRepositoryTest {
     @Test
     public void testSaveOneInLargeDocument() throws IOException {
         int number = 100_000;
-        Producer producer = ProducerProvider.getProducerWithSouvenirs();
+        Producer producer = ProducerProvider.getProducerWithSouvenirsId();
         List<Producer> producers = ProducerProvider.getProducers(number);
         repository.saveAll(producers);
         repository.save(producer);
         producers.add(producer);
         assertThat(getSavedProducers()).isEqualTo(producers);
     }
-
 
 
     @Test
@@ -100,7 +102,7 @@ public class ProducerRepositoryTest {
     @Test
     public void testSpeedSavingOneIntoLargeDocument() {
         int number = 100_000;
-        Producer ukProducer = ProducerProvider.getProducerWithSouvenirs();
+        Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
         List<Producer> producers = ProducerProvider.getProducers(number);
         repository.saveAll(producers);
         long startSaveLast = System.currentTimeMillis();
@@ -124,9 +126,9 @@ public class ProducerRepositoryTest {
         int number = 10;
         List<Producer> producers = ProducerProvider.getProducers(number);
         repository.saveAll(producers);
-        Producer defaultProducer = producers.get(number/2);
-        Producer expected = repository.getById(defaultProducer.getId()).orElseThrow();
-        assertThat(expected).isEqualTo(defaultProducer);
+        Producer defaultProducerEntity = producers.get(number/2);
+        Producer expected = repository.getById(defaultProducerEntity.getId()).orElseThrow();
+        assertThat(expected).isEqualTo(defaultProducerEntity);
     }
 
 
@@ -151,7 +153,51 @@ public class ProducerRepositoryTest {
         assertThat(afterRemoving)
                 .doesNotContain(toDelete)
                 .size().isEqualTo(number - 1);
+    }
 
+
+    @Test
+    public void getByPriceLessThan() {
+        int number = 10;
+        double price = 10;
+        List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
+        repository.saveAll(producers);
+        saveSouvenirs(producers);
+        assertThat(repository.getByPriceLessThan(price)).isEqualTo(getProducersWithPriceLessThan(producers, price));
+    }
+
+
+    @Test
+    public void getByPriceEmptyList() {
+        // Ціна непарних виробників товару у тестовому List<Producer> getProducerWithSouvenirPrices буде зазначена
+        // як вища за вказану у тесті. Як наслілок - буде створений List лише з одним виробником та вищою ціною.
+        int number = 1;
+        double price = 10;
+        List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
+        repository.saveAll(producers);
+        saveSouvenirs(producers);
+        assertThat(repository.getByPriceLessThan(price))
+                .isEqualTo(getProducersWithPriceLessThan(producers, price))
+                .isEmpty();
+    }
+
+    private static List<Producer> getProducersWithPriceLessThan(List<Producer> producers, double price) {
+        return producers.stream()
+                .filter(p -> p.getSouvenirs().stream()
+                        .map(Souvenir::getPrice)
+                        .anyMatch(pr -> pr < price))
+                         .collect(Collectors.toList());
+    }
+
+    private void saveSouvenirs(List<Producer> producers) {
+        List<Souvenir> allSouvenirs = producers.stream()
+                .flatMap(r -> r.getSouvenirs().stream())
+                .toList();
+
+        when(storage.getSouvenirsStorage()).thenReturn(SOUVENIRS);
+        new Document<Souvenir>(storage).create(SOUVENIRS);
+        SouvenirRepository souvenirRepository = new SouvenirRepository(storage);
+        souvenirRepository.saveAll(allSouvenirs);
     }
 
 

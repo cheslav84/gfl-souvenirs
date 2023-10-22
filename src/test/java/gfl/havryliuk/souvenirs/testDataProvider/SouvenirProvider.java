@@ -11,15 +11,26 @@ import java.util.UUID;
 public class SouvenirProvider {
 
 
-    public static Souvenir getSouvenir() {
+    public static Souvenir getSouvenirWithProducer() {
         LocalDateTime date = LocalDateTime.of(2014, 12, 20, 2, 30);
 
-        return new Souvenir (
+        return new Souvenir(
                 "Tea cup",
                 80.99,
                 date,
 //                LocalDateTime.parse("2018-12-30T19:34:50.63"),
                 ProducerProvider.getProducerWithOnlyId()
+        );
+    }
+
+    public static Souvenir getSouvenir(Producer producer) {
+        LocalDateTime date = LocalDateTime.of(2014, 12, 20, 2, 30);
+
+        return new Souvenir(
+                "Tea cup",
+                80.99,
+                date,
+                producer
         );
     }
 
@@ -30,10 +41,18 @@ public class SouvenirProvider {
         return souvenir;
     }
 
-    public static List<Souvenir> getSouvenirs(int number) {
+    public static List<Souvenir> getSouvenirsWithProducer(int number) {
         List<Souvenir> souvenirs = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
-            souvenirs.add(getSouvenir());
+            souvenirs.add(getSouvenirWithProducer());
+        }
+        return souvenirs;
+    }
+
+    public static List<Souvenir> getSouvenirs(int number, Producer producer) {
+        List<Souvenir> souvenirs = new ArrayList<>(number);
+        for (int i = 0; i < number; i++) {
+            souvenirs.add(getSouvenir(producer));
         }
         return souvenirs;
     }

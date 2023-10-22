@@ -4,7 +4,9 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
+import gfl.havryliuk.souvenirs.repository.storage.Storage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
+import org.mockito.Mock;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -17,6 +19,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.testng.Assert.assertTrue;
 
 public class DocumentTest {
+
+    @Mock
+    private Storage storage;
     private static final File FILE = new File("src/test/java/data/Strings.json");
     private Document<Producer> producers;
     private ObjectMapper mapper;
@@ -24,8 +29,8 @@ public class DocumentTest {
 
     @BeforeMethod
     public void setUp() {
-        producers = new Document<>();
-        mapper = Mapper.getObjectMapper();
+        producers = new Document<>(storage);
+        mapper = Mapper.getMapper();
     }
 
     @AfterMethod
@@ -45,7 +50,7 @@ public class DocumentTest {
     @Test
     public void testGetDocument() {
         producers.create(FILE);
-        ArrayNode document = producers.getDocument(FILE);
+        ArrayNode document = producers.getRecords(FILE);
         assertTrue(document.isEmpty());
     }
 
@@ -56,9 +61,9 @@ public class DocumentTest {
         Producer uaProducer = ProducerProvider.getProducer();
 
         producers.create(FILE);
-        ArrayNode document = producers.getDocument(FILE);
+        ArrayNode document = producers.getRecords(FILE);
         document.add(mapper.valueToTree(uaProducer));
-        producers.saveDocument(FILE, document);
+        producers.saveRecords(FILE, document);
 
         List<Producer> savedProducers = mapper.readValue(FILE, new TypeReference<>(){});
         Producer savedUaProducer = savedProducers.get(0);

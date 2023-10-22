@@ -1,12 +1,11 @@
 package gfl.havryliuk.souvenirs.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -14,19 +13,15 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 public class Souvenir {
-//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private String name;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private double price;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private LocalDateTime productionDate;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
+    @JsonIgnoreProperties({"name", "country", "souvenirs" })
     private Producer producer;
 
     public Souvenir(String name, double price, LocalDateTime productionDate, Producer producer) {
@@ -37,19 +32,6 @@ public class Souvenir {
         this.producer = producer;
     }
 
-
-//    public Souvenir(UUID id) {
-//        this.id = id;
-//    }
-
-    public Souvenir(Souvenir souvenir) {
-        this.id = souvenir.getId();
-        this.name = souvenir.getName();
-        this.price = souvenir.getPrice();
-        this.productionDate = souvenir.productionDate;
-        this.producer = new Producer();
-        producer.setId(souvenir.getProducer().getId());
-    }
 
     @Override
     public boolean equals(Object o) {
