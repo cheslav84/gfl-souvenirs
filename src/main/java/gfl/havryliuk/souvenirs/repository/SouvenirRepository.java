@@ -76,6 +76,15 @@ public class SouvenirRepository implements Repository<Souvenir> {
                 .collect(Collectors.toList());
     }
 
+    public List<Souvenir> getByCountry(String country) {
+        List<UUID> producersIdByCountry = producerRepository.getProducersIdByCountry(country);
+
+        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+                .filter(s -> producersIdByCountry.contains(s.getProducer().getId()))
+                .distinct()
+                .collect(Collectors.toList());
+    }
 
 
 

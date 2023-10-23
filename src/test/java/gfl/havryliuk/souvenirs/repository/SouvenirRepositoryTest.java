@@ -8,6 +8,7 @@ import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerAndSouvenirProvider;
+import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -266,6 +267,10 @@ public class SouvenirRepositoryTest {
     }
 
 
+
+
+
+
     @Test
     public void testDeleteAll() {
         int producers = 20;
@@ -322,11 +327,30 @@ public class SouvenirRepositoryTest {
         List<Producer> producers = ProducerAndSouvenirProvider
                 .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
 
-        souvenirRepository.getByProducer(producers.get(producerAmount/2));
-
         assertThat(souvenirRepository.getByProducer(producers.get(producerAmount/2)))
                 .isEqualTo(producers.get(producerAmount/2).getSouvenirs());
 
+    }
+
+    @Test
+    public void testGetByCountry() {
+        int producerAmount = 8;
+        int souvenirsInProducer = 8;
+        String searchedCountry = "US";
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+        List<Producer> producers = ProducerAndSouvenirProvider
+                .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
+
+        List<Producer> USProducers = ProducerProvider.setCountry(producers, producerAmount / 2, searchedCountry);
+
+        List<Souvenir> souvenirs = USProducers.stream()
+                        .flatMap(p -> p.getSouvenirs().stream())
+                                .collect(Collectors.toList());
+
+        producerRepository.saveAll(producers);
+
+        assertThat(souvenirRepository.getByCountry(searchedCountry))
+                .isEqualTo(souvenirs);
     }
 
 

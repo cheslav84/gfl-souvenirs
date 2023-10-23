@@ -64,4 +64,15 @@ public class ProducerProvider {
     }
 
 
+    public static List<Producer> setCountry(List<Producer> producers, int number, String country) {
+        int step = producers.size() / number;
+
+        List<Producer> changedCountry = new ArrayList<>(number);
+        for (int i = 0; i < producers.size(); i+=step) {
+            Producer producer = producers.get(i);
+            producer.setCountry(country);
+            changedCountry.add(producer);
+        }
+        return changedCountry;
+    }
 }

@@ -58,17 +58,17 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
     }
 
 
-// Вивести інформацію про виробників, чиї ціни на сувеніри менше заданої.
-public List<Producer> getByPriceLessThan(double price) {
+    // Вивести інформацію про виробників, чиї ціни на сувеніри менше заданої.
+    public List<Producer> getByPriceLessThan(double price) {
 
-    return StreamSupport.stream(producerDocument.getSpliterator(), false)
-            .map((node) -> mapper.mapEntity(node, Producer.class))
-            .filter(p -> getProducersId(price).stream()
-                    .map(Producer::getId)
-                    .anyMatch(id -> id.equals(p.getId())))
-            .distinct()
-            .collect(Collectors.toList());
-}
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Producer.class))
+                .filter(p -> getProducersId(price).stream()
+                        .map(Producer::getId)
+                        .anyMatch(id -> id.equals(p.getId())))
+                .distinct()
+                .collect(Collectors.toList());
+    }
 
     private List<Producer> getProducersId(double price) {
         return StreamSupport.stream(souvenirRepository.getSouvenirDocument().getSpliterator(), false)
@@ -149,10 +149,19 @@ public List<Producer> getByPriceLessThan(double price) {
         while (producerElements.hasNext()) {
             JsonNode producerNode = producerElements.next();
             Producer producer = mapper.mapEntity(producerNode, Producer.class);
-            if (producersId.contains(producer.getId())){
+            if (producersId.contains(producer.getId())) {
                 producerElements.remove();
             }
         }
+    }
+
+    List<UUID> getProducersIdByCountry(String country) {
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Producer.class))
+                .filter(p -> p.getCountry().equals(country))
+                .map(Producer::getId)
+                .collect(Collectors.toList());
+
     }
 
 }

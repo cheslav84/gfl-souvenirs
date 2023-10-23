@@ -15,10 +15,10 @@ public class ProducerAndSouvenirProvider {
                                                              SouvenirRepository souvenirRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
         List<Producer> allProducers = new ArrayList<>();
-        List<Souvenir> toDelete = new ArrayList<>();
+        List<Souvenir> toReturn = new ArrayList<>();
         initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
-                toDelete, allSouvenirs, allProducers);
-        return toDelete;
+                toReturn, allSouvenirs, allProducers);
+        return toReturn;
     }
 
     public static Souvenir initStoragesAndGetSouvenir(int producers, int souvenirsInProducer,
@@ -37,9 +37,9 @@ public class ProducerAndSouvenirProvider {
                                               SouvenirRepository souvenirRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
         List<Producer> allProducers = new ArrayList<>();
-        List<Souvenir> toDelete = new ArrayList<>();
+        List<Souvenir> toReturn = new ArrayList<>();
         initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
-                toDelete, allSouvenirs, allProducers);
+                toReturn, allSouvenirs, allProducers);
         return allProducers;
     }
 
@@ -54,13 +54,13 @@ public class ProducerAndSouvenirProvider {
 
 
     private static void initStorages(int producers, int souvenirsInProducer, ProducerRepository producerRepository,
-                                     SouvenirRepository souvenirRepository, List<Souvenir> toDelete,
+                                     SouvenirRepository souvenirRepository, List<Souvenir> toReturn,
                                      List<Souvenir> allSouvenirs, List<Producer> allProducers) {
         for (int i = 0; i < producers; i++) {
             Producer producer = ProducerProvider.getProducer();
             List<Souvenir> souvenirs = SouvenirProvider.getSouvenirs(souvenirsInProducer, producer);
             producer.setSouvenirs(souvenirs);
-            toDelete.add(souvenirs.get(i));
+            toReturn.add(souvenirs.get(i));
             allProducers.add(producer);
             allSouvenirs.addAll(souvenirs);
         }
