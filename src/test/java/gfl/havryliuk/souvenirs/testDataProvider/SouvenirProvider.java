@@ -12,13 +12,10 @@ public class SouvenirProvider {
 
 
     public static Souvenir getSouvenirWithProducer() {
-        LocalDateTime date = LocalDateTime.of(2014, 12, 20, 2, 30);
-
         return new Souvenir(
                 "Tea cup",
                 80.99,
-                date,
-//                LocalDateTime.parse("2018-12-30T19:34:50.63"),
+                LocalDateTime.parse("2018-12-30T19:34:50.63"),
                 ProducerProvider.getProducerWithOnlyId()
         );
     }

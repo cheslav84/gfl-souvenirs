@@ -4,8 +4,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.repository.storage.ProducerStorage;
-import gfl.havryliuk.souvenirs.repository.storage.SouvenirStorage;
+import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
+import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -28,10 +28,10 @@ import static org.mockito.Mockito.when;
 @Listeners(MockitoTestNGListener.class)
 public class ProducerRepositoryTest {
     @Mock
-    private ProducerStorage producerStorage;
+    private ProducerFileStorage producerStorage;
 
     @Mock
-    private SouvenirStorage souvenirStorage;
+    private SouvenirFileStorage souvenirStorage;
 
     private static final String PRODUCERS_PATH = "src/test/java/data/Producers.json";
     private static final String SOUVENIR_PATH = "src/test/java/data/Souvenirs.json";
@@ -39,6 +39,7 @@ public class ProducerRepositoryTest {
     private static final File SOUVENIRS = new File(SOUVENIR_PATH);
     private final ObjectMapper mapper = Mapper.getMapper();
     private ProducerRepository repository;
+    private SouvenirRepository souvenirRepository;
 
 
     @BeforeMethod
@@ -200,14 +201,14 @@ public class ProducerRepositoryTest {
                 .flatMap(r -> r.getSouvenirs().stream())
                 .toList();
 
-        SouvenirRepository souvenirRepository = initSouvenirRepository();
+        initSouvenirRepository();
         souvenirRepository.saveAll(allSouvenirs);
     }
 
-    private SouvenirRepository initSouvenirRepository() {
+    private void initSouvenirRepository() {
         when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
         new Document<Souvenir>(souvenirStorage).create();
-        return new SouvenirRepository(souvenirStorage);
+        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
     }
 
 

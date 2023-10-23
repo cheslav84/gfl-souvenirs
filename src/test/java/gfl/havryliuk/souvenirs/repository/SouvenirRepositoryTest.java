@@ -3,8 +3,11 @@ package gfl.havryliuk.souvenirs.repository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.repository.storage.SouvenirStorage;
+import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
+import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
+import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -19,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
@@ -26,23 +30,31 @@ import static org.mockito.Mockito.when;
 @Listeners(MockitoTestNGListener.class)
 public class SouvenirRepositoryTest {
     @Mock
-    private SouvenirStorage souvenirStorage;
-    private static final String SOUVENIRS_PATH = "src/test/java/data/Souvenir.json";
-    private static final File SOUVENIRS = new File(SOUVENIRS_PATH);
+    private SouvenirFileStorage souvenirStorage;
+
+    @Mock
+    private ProducerFileStorage producerStorage;
+
+    private static final String SOUVENIR_PATH = "src/test/java/data/Souvenirs.json";
+    private static final String PRODUCERS_PATH = "src/test/java/data/Producers.json";
+    private static final File SOUVENIRS = new File(SOUVENIR_PATH);
+    private static final File PRODUCERS = new File(PRODUCERS_PATH);
     private final ObjectMapper mapper = Mapper.getMapper();
     private SouvenirRepository repository;
+    private ProducerRepository producerRepository;
 
 
     @BeforeMethod
     public void setUp() {
         when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
         new Document<Souvenir>(souvenirStorage).create();
-        repository = new SouvenirRepository(souvenirStorage);
+        repository = new SouvenirRepository(souvenirStorage, producerStorage);
     }
 
     @AfterMethod
     public void tearDown() {
-        SOUVENIRS.deleteOnExit();
+//        SOUVENIRS.deleteOnExit();
+//        PRODUCERS.deleteOnExit();
     }
 
 
@@ -130,7 +142,7 @@ public class SouvenirRepositoryTest {
     }
 
 
-      @Test
+    @Test
     public void testGetByIdNotFound() {
         int number = 10;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
@@ -141,17 +153,43 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testDelete() {
-        int number = 10;
-        List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
-        repository.saveAll(souvenirs);
-        Souvenir toDelete = souvenirs.get(number/2);
-        repository.delete(toDelete.getId());
-        List<Souvenir> afterRemoving = repository.getAll();
-
-        assertThat(afterRemoving)
-                .doesNotContain(toDelete)
+        int number = 3;
+        Producer producer = ProducerProvider.getProducer();
+        Souvenir souvenirToDelete = initStorages(number, producer);
+        repository.delete(souvenirToDelete.getId());
+        assertThat(repository.getAll())
+                .doesNotContain(souvenirToDelete)
                 .size().isEqualTo(number - 1);
     }
+
+    @Test
+    public void testDeleteRemovesProducerId() {
+        int number = 3;
+        Producer producer = ProducerProvider.getProducer();
+        Souvenir souvenirToDelete = initStorages(number, producer);
+        repository.delete(souvenirToDelete.getId());
+        assertThat(getProducerSouvenirsId(producer))
+                .doesNotContain(souvenirToDelete.getId())
+                .size().isEqualTo(number - 1);
+    }
+
+    private List<UUID> getProducerSouvenirsId(Producer producer) {
+        return producerRepository.getById(producer.getId())
+                .orElseThrow()
+                .getSouvenirs().stream()
+                .map(Souvenir::getId)
+                .collect(Collectors.toList());
+    }
+
+    private Souvenir initStorages(int number, Producer producer) {
+        initProducerRepository();
+        List<Souvenir> souvenirs = SouvenirProvider.getSouvenirs(number, producer);
+        producer.setSouvenirs(souvenirs);
+        repository.saveAll(souvenirs);
+        producerRepository.save(producer);
+        return souvenirs.get(number/2);
+    }
+
 
 
     private List<Souvenir> getSavedSouvenirs() throws IOException {
@@ -159,4 +197,31 @@ public class SouvenirRepositoryTest {
     }
 
 
+    @Test
+    public void testDeleteAll() {
+        int number = 100;
+        List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+
+        List<Souvenir> toDelete = souvenirs.stream()
+                .filter(s -> s.hashCode() % 2 == 0)
+                .collect(Collectors.toList());
+
+        List<Souvenir> remainders = souvenirs.stream()
+                .filter(s -> s.hashCode() % 2 != 0)
+                .collect(Collectors.toList());
+
+        repository.saveAll(souvenirs);
+        repository.deleteAll(toDelete);
+
+        assertThat(repository.getAll())
+                .isEqualTo(remainders)
+                .doesNotContainAnyElementsOf(toDelete);
+
+    }
+
+    private void initProducerRepository() {
+        when(producerStorage.getStorage()).thenReturn(PRODUCERS);
+        new Document<Producer>(producerStorage).create();
+        producerRepository = new ProducerRepository(producerStorage, souvenirStorage);
+    }
 }

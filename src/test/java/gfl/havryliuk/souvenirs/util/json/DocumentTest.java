@@ -4,7 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
-import gfl.havryliuk.souvenirs.repository.storage.Storage;
+import gfl.havryliuk.souvenirs.storage.FileStorage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
@@ -26,7 +26,7 @@ public class DocumentTest {
 
     @BeforeMethod
     public void setUp() {
-        Storage storage = () -> STORAGE;
+        FileStorage storage = () -> STORAGE;
         new Document<Producer>(storage).create();
         producers = new Document<>(storage);
     }

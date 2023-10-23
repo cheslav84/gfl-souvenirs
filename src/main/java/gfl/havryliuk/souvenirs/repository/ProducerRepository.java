@@ -4,8 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.repository.storage.ProducerStorage;
-import gfl.havryliuk.souvenirs.repository.storage.SouvenirStorage;
+import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
+import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
 
@@ -14,41 +14,35 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class ProducerRepository implements Repository<Producer> {
-//    private final ProducerStorage producerStorage;// todo - винести storage в document
-    private final Document<Producer> producersDocument;
+    private final Document<Producer> producerDocument;
     private final Document<Souvenir> souvenirDocument;
     private final Mapper mapper;
 
-    public ProducerRepository(ProducerStorage producerStorage, SouvenirStorage souvenirStorage) {
-        this.producersDocument = new Document<>(producerStorage);
+    public ProducerRepository(ProducerFileStorage producerStorage, SouvenirFileStorage souvenirStorage) {
+        this.producerDocument = new Document<>(producerStorage);
         this.souvenirDocument = new Document<>(souvenirStorage);
         this.mapper = Mapper.getMapper();
     }
 
-//    public ProducerRepository(ProducerStorage producerStorage) {
-//        this.producersDocument = new Document<>(producerStorage);
-//        this.mapper = Mapper.getMapper();
-//    }
-
 
     @Override
     public void save(Producer producer) {
-        ArrayNode records = producersDocument.getRecords();
+        ArrayNode records = producerDocument.getRecords();
         records.add(mapper.valueToTree(producer));
-        producersDocument.saveRecords(records);
+        producerDocument.saveRecords(records);
     }
 
     public void saveAll(List<Producer> producers) {
-        ArrayNode records = producersDocument.getRecords();
+        ArrayNode records = producerDocument.getRecords();
         for (Producer producer : producers) {
             records.add(mapper.valueToTree(producer));
         }
-        producersDocument.saveRecords(records);
+        producerDocument.saveRecords(records);
     }
 
     @Override
     public List<Producer> getAll() {
-        return StreamSupport.stream(producersDocument.getSpliterator(), false)
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
                 .collect(Collectors.toList());
     }
@@ -57,7 +51,7 @@ public class ProducerRepository implements Repository<Producer> {
 // Вивести інформацію про виробників, чиї ціни на сувеніри менше заданої.
 public List<Producer> getByPriceLessThan(double price) {
 
-    return StreamSupport.stream(producersDocument.getSpliterator(), false)
+    return StreamSupport.stream(producerDocument.getSpliterator(), false)
             .map((node) -> mapper.mapEntity(node, Producer.class))
             .filter(p -> getProducersId(price).stream()
                     .map(Producer::getId)
@@ -67,11 +61,7 @@ public List<Producer> getByPriceLessThan(double price) {
 }
 
     private List<Producer> getProducersId(double price) {
-//        Spliterator<JsonNode> spliterator = souvenirDocument.getSpliterator();
-
-
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
-//        return StreamSupport.stream(souvenirDocument.getSpliterator(producerStorage.getStorage()), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
                 .filter(s -> s.getPrice() < price)
                 .map(Souvenir::getProducer)
@@ -82,7 +72,7 @@ public List<Producer> getByPriceLessThan(double price) {
 
     @Override
     public Optional<Producer> getById(UUID id) {
-        return StreamSupport.stream(producersDocument.getSpliterator(), false)
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
                 .filter(producer -> producer.getId().equals(id))
                 .findAny();
@@ -90,8 +80,8 @@ public List<Producer> getByPriceLessThan(double price) {
 
 
     @Override
-    public void delete(UUID id) {
-        ArrayNode producers = producersDocument.getRecords();
+    public void delete(UUID id) {//todo Видалити сувеніри
+        ArrayNode producers = producerDocument.getRecords();
         Iterator<JsonNode> elements = producers.elements();
         while (elements.hasNext()) {
             JsonNode node = elements.next();
@@ -101,7 +91,7 @@ public List<Producer> getByPriceLessThan(double price) {
                 break;
             }
         }
-        producersDocument.saveRecords(producers);
+        producerDocument.saveRecords(producers);
     }
 
 

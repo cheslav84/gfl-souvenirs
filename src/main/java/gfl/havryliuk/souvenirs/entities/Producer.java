@@ -19,6 +19,7 @@ import java.util.stream.Collectors;
 @Getter
 @Setter
 @NoArgsConstructor
+//@JsonIgnoreProperties(ignoreUnknown = true)
 public class Producer {
 
 //    @JsonProperty(access = JsonProperty.Access.READ_ONLY)

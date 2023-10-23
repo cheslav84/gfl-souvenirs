@@ -3,7 +3,7 @@ package gfl.havryliuk.souvenirs.util.json;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
-import gfl.havryliuk.souvenirs.repository.storage.Storage;
+import gfl.havryliuk.souvenirs.storage.FileStorage;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -11,11 +11,11 @@ import java.util.Spliterator;
 
 
 
-public class Document<T> {
+public class Document<T> {//TODO видалити параметризацію
 
-    private final Storage storage;
+    private final FileStorage storage;
 
-    public Document(Storage storage) {
+    public Document(FileStorage storage) {
         this.storage = storage;
     }
 
@@ -52,10 +52,10 @@ public class Document<T> {
         }
     }
 
-
     public Spliterator<JsonNode> getSpliterator() {
         return getRecords().spliterator();
     }
+
 
 
 

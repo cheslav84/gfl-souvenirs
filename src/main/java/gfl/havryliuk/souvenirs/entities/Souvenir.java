@@ -12,6 +12,8 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
+//@JsonIgnoreProperties(ignoreUnknown = true)
+
 public class Souvenir {
     private UUID id;
 
@@ -21,7 +23,7 @@ public class Souvenir {
 
     private LocalDateTime productionDate;
 
-    @JsonIgnoreProperties({"name", "country", "souvenirs" })
+    @JsonIgnoreProperties(value = {"name", "country", "souvenirs" })
     private Producer producer;
 
     public Souvenir(String name, double price, LocalDateTime productionDate, Producer producer) {
