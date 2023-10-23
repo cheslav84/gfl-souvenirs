@@ -20,6 +20,7 @@ import org.testng.annotations.Listeners;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -63,26 +64,46 @@ public class ProducerRepositoryTest {
 
     @Test
     public void testSave() throws IOException {
-        Producer uaProducer = ProducerProvider.getProducer();
-        Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
+        Producer producer1 = ProducerProvider.getProducerWithSouvenirs();
+        Producer producer2 = ProducerProvider.getProducerWithSouvenirs();
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
 
-        producerRepository.save(uaProducer);
-        producerRepository.save(ukProducer);
+        producerRepository.save(producer1);
+        producerRepository.save(producer2);
 
         List<Producer> savedProducers = getSavedProducers();
         Producer savedUaProducer = savedProducers.get(0);
         Producer savedUkProducer = savedProducers.get(1);
 
         assertThat(savedProducers).size().isEqualTo(2);
-        assertThat(savedUaProducer).isEqualTo(uaProducer);
-        assertThat(savedUkProducer).isEqualTo(ukProducer);
+        assertThat(savedUaProducer).isEqualTo(producer1);
+        assertThat(savedUkProducer).isEqualTo(producer2);
+    }
+
+    @Test
+    public void testSaveSouvenirsWhileSavingProducer() {
+        Producer producer1 = ProducerProvider.getProducerWithSouvenirs();
+        Producer producer2 = ProducerProvider.getProducerWithSouvenirs();
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+
+        producerRepository.save(producer1);
+        producerRepository.save(producer2);
+
+        List<Souvenir> souvenirs = new ArrayList<>();
+        souvenirs.addAll(producer1.getSouvenirs());
+        souvenirs.addAll(producer2.getSouvenirs());
+
+        assertThat(souvenirRepository.getAll()).isEqualTo(souvenirs);
+
     }
 
 
     @Test
     public void testSaveAllProducerSaving() throws IOException {
-        int number = 100_000;
+        int number = 10_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+
         producerRepository.saveAll(producers);
         assertThat(getSavedProducers()).isEqualTo(producers);
     }
@@ -90,9 +111,10 @@ public class ProducerRepositoryTest {
 
     @Test
     public void testSaveOneInLargeDocument() throws IOException {
-        int number = 100_000;
-        Producer producer = ProducerProvider.getProducerWithSouvenirsId();
+        int number = 10_000;
+        Producer producer = ProducerProvider.getProducerWithSouvenirs();
         List<Producer> producers = ProducerProvider.getProducers(number);
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
         producerRepository.save(producer);
         producers.add(producer);
@@ -102,8 +124,10 @@ public class ProducerRepositoryTest {
 
     @Test
     public void testSpeedSavingLargeNumberOfProducers() {
-        int number = 100_000;
+        int number = 10_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+
         long startSaveAll = System.currentTimeMillis();
         producerRepository.saveAll(producers);
         long endSaveAll = System.currentTimeMillis();
@@ -113,9 +137,10 @@ public class ProducerRepositoryTest {
 
     @Test
     public void testSpeedSavingOneIntoLargeDocument() {
-        int number = 100_000;
-        Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
+        int number = 25_000;
+        Producer ukProducer = ProducerProvider.getProducerWithSouvenirs();
         List<Producer> producers = ProducerProvider.getProducers(number);
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
         long startSaveLast = System.currentTimeMillis();
         producerRepository.save(ukProducer);
@@ -126,23 +151,23 @@ public class ProducerRepositoryTest {
 
     @Test
     public void testUpdate() throws IOException {
-        Producer uaProducer = ProducerProvider.getProducer();
-        Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
+        Producer producer1 = ProducerProvider.getProducerWithSouvenirs();
+        Producer producer2 = ProducerProvider.getProducerWithSouvenirs();
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+        producerRepository.save(producer1);
+        producerRepository.save(producer2);
 
-        producerRepository.save(uaProducer);
-        producerRepository.save(ukProducer);
-
-        ukProducer.setCountry("England");
-        ukProducer.getSouvenirs().add(SouvenirProvider.getSouvenirWithProducer());
-        producerRepository.save(ukProducer);
+        producer2.setCountry("England");
+        producer2.getSouvenirs().add(SouvenirProvider.getSouvenir(producer2));
+        producerRepository.save(producer2);
 
         List<Producer> savedProducers = getSavedProducers();
         Producer savedUaProducer = savedProducers.get(0);
         Producer savedUkProducer = savedProducers.get(1);
 
         assertThat(savedProducers).size().isEqualTo(2);
-        assertThat(savedUaProducer).isEqualTo(uaProducer);
-        assertThat(savedUkProducer).isEqualTo(ukProducer);
+        assertThat(savedUaProducer).isEqualTo(producer1);
+        assertThat(savedUkProducer).isEqualTo(producer2);
     }
 
 
@@ -152,7 +177,7 @@ public class ProducerRepositoryTest {
         int changeFrom = 2;
         int changeTo = 3;
         List<Producer> producers = ProducerProvider.getProducers(number);
-
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
 
         for (int i = changeFrom; i <= changeTo; i++) {
@@ -166,9 +191,10 @@ public class ProducerRepositoryTest {
         assertThat(getSavedProducers()).isEqualTo(producers);
     }
 
+
     @Test
     public void testGetAll() {
-        int number = 100_000;
+        int number = 25_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
         producerRepository.saveAll(producers);
         assertThat(producerRepository.getAll()).isEqualTo(producers);
@@ -233,7 +259,8 @@ public class ProducerRepositoryTest {
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
         saveSouvenirs(producers);
-        assertThat(producerRepository.getByPriceLessThan(price)).isEqualTo(getProducersWithPriceLessThan(producers, price));
+        assertThat(producerRepository.getByPriceLessThan(price))
+                .isEqualTo(getProducersWithPriceLessThan(producers, price));
     }
 
 

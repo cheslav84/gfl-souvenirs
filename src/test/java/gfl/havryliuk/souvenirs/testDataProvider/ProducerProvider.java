@@ -13,10 +13,10 @@ public class ProducerProvider {
         return new Producer("Ukraine Producer", "Ukraine");
     }
 
-    public static Producer getProducerWithSouvenirsId() {
+    public static Producer getProducerWithSouvenirs() {
         Producer producer = new Producer("UK Producer", "UK");
-        producer.getSouvenirs().add(SouvenirProvider.getSouvenirWithOnlyId());
-        producer.getSouvenirs().add(SouvenirProvider.getSouvenirWithOnlyId());
+        producer.getSouvenirs().add(SouvenirProvider.getSouvenir(producer));
+        producer.getSouvenirs().add(SouvenirProvider.getSouvenir(producer));
         return producer;
     }
 
@@ -31,7 +31,7 @@ public class ProducerProvider {
     public static List<Producer> getProducers(int number) {
         List<Producer> producers = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
-            producers.add(getProducerWithSouvenirsId());
+            producers.add(getProducerWithSouvenirs());
         }
         return producers;
     }

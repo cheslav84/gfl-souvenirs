@@ -35,15 +35,19 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
         removeProducer(producer.getId(), producerArray);
         producerArray.add(mapper.valueToTree(producer));
         producerDocument.saveRecords(producerArray);
+        souvenirRepository.saveAll(producer.getSouvenirs());
     }
 
     public void saveAll(List<Producer> producers) {
         ArrayNode producerArray = producerDocument.getRecords();
-            removeProducers(producers, producerArray);
+        List<Souvenir> souvenirs = new ArrayList<>();
+        removeProducers(producers, producerArray);
         for (Producer producer : producers) {
             producerArray.add(mapper.valueToTree(producer));
+            souvenirs.addAll(producer.getSouvenirs());
         }
         producerDocument.saveRecords(producerArray);
+        souvenirRepository.saveAll(souvenirs);
     }
 
     @Override

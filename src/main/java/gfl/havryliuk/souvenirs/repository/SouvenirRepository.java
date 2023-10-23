@@ -43,7 +43,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
                 .toArray(UUID[]::new);
         producerRepository.isAllProducersStored(producerIdToStore);
         ArrayNode souvenirArray = souvenirDocument.getRecords();
-        removeSouvenirs(souvenirs, souvenirArray);
+        removeSouvenirs(souvenirs, souvenirArray);//todo подумати, може не видаляти а замінювати,
         for (Souvenir souvenir : souvenirs) {
             souvenirArray.add(mapper.valueToTree(souvenir));
         }
