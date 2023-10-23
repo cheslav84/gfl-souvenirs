@@ -304,8 +304,8 @@ public class SouvenirRepositoryTest {
         int producers = 100;
         int souvenirsInProducer = 500;
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
-                producerRepository, souvenirRepository);
+        List<Souvenir> listToDelete = ProducerAndSouvenirProvider
+                .initStoragesAndGetSouvenirs(producers, souvenirsInProducer, producerRepository, souvenirRepository);
 
         long beforeDeleting = System.currentTimeMillis();
         souvenirRepository.deleteAll(listToDelete);
@@ -313,6 +313,27 @@ public class SouvenirRepositoryTest {
 
         assertThat(afterDeleting - beforeDeleting).isLessThan(1000);
     }
+
+    @Test
+    public void testGetByProducer() {
+        int producerAmount = 20;
+        int souvenirsInProducer = 20;
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+        List<Producer> producers = ProducerAndSouvenirProvider
+                .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
+
+        souvenirRepository.getByProducer(producers.get(producerAmount/2));
+
+        assertThat(souvenirRepository.getByProducer(producers.get(producerAmount/2)))
+                .isEqualTo(producers.get(producerAmount/2).getSouvenirs());
+
+    }
+
+
+
+
+
+
 
     private List<UUID> getProducerSouvenirsId() {
         return producerRepository.getAll().stream()
@@ -326,5 +347,4 @@ public class SouvenirRepositoryTest {
         return mapper.readValue(SOUVENIRS, new TypeReference<>() {});
     }
 
-
-}
+ }

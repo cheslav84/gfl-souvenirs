@@ -52,6 +52,15 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
 
     @Override
+    public Optional<Souvenir> getById(UUID id) {
+        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+                .filter(souvenir -> souvenir.getId().equals(id))
+                .findAny();
+    }
+
+
+    @Override
     public List<Souvenir> getAll() {
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
@@ -60,13 +69,16 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
-    @Override
-    public Optional<Souvenir> getById(UUID id) {
+    public List<Souvenir> getByProducer(Producer producer) {
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(producer -> producer.getId().equals(id))
-                .findAny();
+                .filter(s -> s.getProducer().getId().equals(producer.getId()))
+                .collect(Collectors.toList());
     }
+
+
+
+
 
 
 

@@ -32,7 +32,7 @@ public class ProducerAndSouvenirProvider {
 
 
 
-    public static Producer initStoragesAndGetProducer(int producers, int souvenirsInProducer,
+    public static List<Producer> initStoragesAndGetProducers(int producers, int souvenirsInProducer,
                                               ProducerRepository producerRepository,
                                               SouvenirRepository souvenirRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
@@ -40,7 +40,15 @@ public class ProducerAndSouvenirProvider {
         List<Souvenir> toDelete = new ArrayList<>();
         initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
                 toDelete, allSouvenirs, allProducers);
-        return allProducers.get(producers/2);
+        return allProducers;
+    }
+
+
+    public static Producer initStoragesAndGetProducer(int producers, int souvenirsInProducer,
+                                                      ProducerRepository producerRepository,
+                                                      SouvenirRepository souvenirRepository) {
+        return initStoragesAndGetProducers(producers, souvenirsInProducer, producerRepository, souvenirRepository)
+                .get(producers/2);
     }
 
 

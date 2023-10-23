@@ -282,29 +282,6 @@ public class ProducerRepositoryTest {
     }
 
 
-//    @Test
-//    public void testDeleteAll() {
-//        int producers = 20;
-//        int souvenirsInProducer = 20;
-//        initSouvenirRepository();
-//
-//        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStorages(producers, souvenirsInProducer,
-//                producerRepository, souvenirRepository);
-//
-//
-//        producerRepository.deleteAll(listToDelete);
-//
-//        assertThat(producerRepository.getAll())
-//                .doesNotContainAnyElementsOf(listToDelete)
-//                .size().isEqualTo(producers * souvenirsInProducer - listToDelete.size());
-//    }
-
-
-
-
-
-
-
 
     private static List<Producer> getProducersWithPriceLessThan(List<Producer> producers, double price) {
         return producers.stream()
