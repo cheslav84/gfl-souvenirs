@@ -61,32 +61,26 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
 
     @Override
-    public void delete(UUID id) {//todo Видалити id у виробника
+    public void delete(UUID id) {
         Optional<Souvenir> souvenirToDelete = getById(id);
         if (souvenirToDelete.isPresent()) {
-            ArrayNode souvenirs = souvenirDocument.getRecords();
-            removeSouvenir(id, souvenirs);
-            removeSouvenirIdFromProducers(id, souvenirs);
+            ArrayNode souvenirArray = souvenirDocument.getRecords();
+            removeSouvenir(id, souvenirArray);
+            souvenirDocument.saveRecords(souvenirArray);
+
+            ArrayNode producerArray = producerDocument.getRecords();
+            removeSouvenirIdFromProducers(id, producerArray);
+            producerDocument.saveRecords(producerArray);
         }
     }
 
-    private void removeSouvenirIdFromProducers(UUID id, ArrayNode souvenirs) {
-        souvenirDocument.saveRecords(souvenirs);
-        ArrayNode producers = producerDocument.getRecords();
-        Iterator<JsonNode> producerElements = producers.elements();
-        while (producerElements.hasNext()) {
-            JsonNode producer = producerElements.next();
-            ArrayNode souvenirsNode = (ArrayNode) producer.path("souvenirs");
-            removeSouvenir(id, souvenirsNode);
-        }
-        producerDocument.saveRecords(producers);
-    }
 
-    private void removeSouvenir(UUID id, ArrayNode souvenirs) {
-        Iterator<JsonNode> souvenirElements = souvenirs.elements();
+
+    private void removeSouvenir(UUID id, ArrayNode souvenirArray) {
+        Iterator<JsonNode> souvenirElements = souvenirArray.elements();
         while (souvenirElements.hasNext()) {
-            JsonNode node = souvenirElements.next();
-            Souvenir souvenir = mapper.mapEntity(node, Souvenir.class);
+            JsonNode souvenirNode = souvenirElements.next();
+            Souvenir souvenir = mapper.mapEntity(souvenirNode, Souvenir.class);
             if (souvenir.getId().equals(id)) {
                 souvenirElements.remove();
                 break;
@@ -94,26 +88,87 @@ public class SouvenirRepository implements Repository<Souvenir> {
         }
     }
 
-
-    public void deleteAll(List<Souvenir> items) {//todo перевірити чи залишилось id у виробників. Якщо так то видалити
-        ArrayNode souvenirs = souvenirDocument.getRecords();
-        Iterator<JsonNode> elements = souvenirs.elements();
-        while (elements.hasNext()) {
-            JsonNode node = elements.next();
-            Souvenir souvenir = mapper.mapEntity(node, Souvenir.class);
-            if (items.contains(souvenir)){
-                elements.remove();// todo подумати над тим як видаляти документи через Spliterator, так швидше
-            }
+    private void removeSouvenirIdFromProducers(UUID id, ArrayNode producerArray) {
+        Iterator<JsonNode> producerElements = producerArray.elements();
+        while (producerElements.hasNext()) {
+            JsonNode producerNode = producerElements.next();
+            ArrayNode souvenirsNode = (ArrayNode) producerNode.path("souvenirs");
+            removeSouvenir(id, souvenirsNode);
         }
-        souvenirDocument.saveRecords(souvenirs);
-
-//        ArrayNode document = souvenirDocument.getRecords();
-//        for (Souvenir souvenir : items) {
-//            document.removeAll(mapper.valueToTree(souvenir));
-//        }
-//        souvenirDocument.saveRecords(document);
     }
 
+
+    public void deleteAll(List<Souvenir> souvenirs) {
+        ArrayNode souvenirNodes = souvenirDocument.getRecords();
+        removeSouvenirs(souvenirs, souvenirNodes);
+        souvenirDocument.saveRecords(souvenirNodes);
+
+        ArrayNode producerArray = producerDocument.getRecords();
+        removeAllSouvenirsIdFromProducers(souvenirs, producerArray);
+        producerDocument.saveRecords(producerArray);
+    }
+
+
+//    void deleteAllWithoutProducer(List<Souvenir> souvenirs) {
+//        ArrayNode souvenirNodes = souvenirDocument.getRecords();
+//        removeSouvenirs(souvenirs, souvenirNodes);
+//        souvenirDocument.saveRecords(souvenirNodes);
+//    }
+
+
+
+    private void removeAllSouvenirsIdFromProducers(List<Souvenir> souvenirs, ArrayNode producerArray) {
+        List<UUID> producersIdDeletedSouvenirs = souvenirs.stream()
+                .map(s -> s.getProducer().getId())
+                .toList();
+
+        List<UUID> souvenirsIdToDeleted = souvenirs.stream()
+                .map(Souvenir::getId)
+                .toList();
+
+        Iterator<JsonNode> producerElements = producerArray.elements();
+
+        while (producerElements.hasNext()) {
+            JsonNode producerNode = producerElements.next();
+            Producer producer = mapper.mapEntity(producerNode, Producer.class);
+            if (producersIdDeletedSouvenirs.contains(producer.getId())) {
+                removeAllSouvenirsIdFromOneProducer(producerNode, producer, souvenirsIdToDeleted);
+            }
+        }
+    }
+
+    private void removeAllSouvenirsIdFromOneProducer(JsonNode producerNode, Producer producer,
+                                                     List<UUID> souvenirsIdToDeleted) {
+        ArrayNode souvenirsNode = (ArrayNode) producerNode.path("souvenirs");
+        for (Souvenir souvenir: producer.getSouvenirs()) {
+            if (souvenirsIdToDeleted.contains(souvenir.getId())){
+                removeSouvenir(souvenir.getId(), souvenirsNode);
+            }
+
+        }
+    }
+
+
+    void deleteAllWithoutProducer(List<Souvenir> souvenirs) {
+        ArrayNode souvenirNodes = souvenirDocument.getRecords();
+        removeSouvenirs(souvenirs, souvenirNodes);
+        souvenirDocument.saveRecords(souvenirNodes);
+    }
+
+    private void removeSouvenirs(List<Souvenir> souvenirs, ArrayNode souvenirNodes) {
+        List<UUID> souvenirsId = souvenirs.stream()
+                .map(Souvenir::getId)
+                .toList();
+
+        Iterator<JsonNode> souvenirElements = souvenirNodes.elements();
+        while (souvenirElements.hasNext()) {
+            JsonNode souvenirNode = souvenirElements.next();
+            Souvenir souvenir = mapper.mapEntity(souvenirNode, Souvenir.class);
+            if (souvenirsId.contains(souvenir.getId())){
+                souvenirElements.remove();
+            }
+        }
+    }
 
 
 }

@@ -13,14 +13,17 @@ import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class ProducerRepository implements Repository<Producer> {
+public class ProducerRepository implements Repository<Producer> {//todo подумати, можливо винести всю роботу з нодами в клас Document
     private final Document<Producer> producerDocument;
     private final Document<Souvenir> souvenirDocument;
+    private final SouvenirRepository souvenirRepository;
     private final Mapper mapper;
 
-    public ProducerRepository(ProducerFileStorage producerStorage, SouvenirFileStorage souvenirStorage) {
+    public ProducerRepository(ProducerFileStorage producerStorage, SouvenirFileStorage souvenirStorage,
+                              SouvenirRepository souvenirRepository) {
         this.producerDocument = new Document<>(producerStorage);
         this.souvenirDocument = new Document<>(souvenirStorage);
+        this.souvenirRepository = souvenirRepository;
         this.mapper = Mapper.getMapper();
     }
 
@@ -81,18 +84,27 @@ public List<Producer> getByPriceLessThan(double price) {
 
     @Override
     public void delete(UUID id) {//todo Видалити сувеніри
-        ArrayNode producers = producerDocument.getRecords();
-        Iterator<JsonNode> elements = producers.elements();
-        while (elements.hasNext()) {
-            JsonNode node = elements.next();
-            Producer producer = mapper.mapEntity(node, Producer.class);
-            if (producer.getId().equals(id)) {
-                elements.remove();
-                break;
+        Optional<Producer> producerToDelete = getById(id);
+        if (producerToDelete.isPresent()) {
+            ArrayNode producers = producerDocument.getRecords();
+            Iterator<JsonNode> elements = producers.elements();
+            while (elements.hasNext()) {
+                JsonNode node = elements.next();
+                Producer producer = mapper.mapEntity(node, Producer.class);
+                if (producer.getId().equals(id)) {
+                    elements.remove();
+                    if (!producer.getSouvenirs().isEmpty()) {
+                        souvenirRepository.deleteAllWithoutProducer(producerToDelete.get().getSouvenirs());
+                    }
+                    break;
+                }
             }
+            producerDocument.saveRecords(producers);
         }
-        producerDocument.saveRecords(producers);
     }
+
+
+
 
 
 }

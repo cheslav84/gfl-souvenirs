@@ -6,6 +6,7 @@ import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
+import gfl.havryliuk.souvenirs.testDataProvider.ProducerAndSouvenirProvider;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -38,7 +39,7 @@ public class ProducerRepositoryTest {
     private static final File PRODUCERS = new File(PRODUCERS_PATH);
     private static final File SOUVENIRS = new File(SOUVENIR_PATH);
     private final ObjectMapper mapper = Mapper.getMapper();
-    private ProducerRepository repository;
+    private ProducerRepository producerRepository;
     private SouvenirRepository souvenirRepository;
 
 
@@ -46,13 +47,14 @@ public class ProducerRepositoryTest {
     public void setUp() {
         when(producerStorage.getStorage()).thenReturn(PRODUCERS);
         new Document<Producer>(producerStorage).create();
-        repository = new ProducerRepository(producerStorage, souvenirStorage);
+        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
+        producerRepository = new ProducerRepository(producerStorage, souvenirStorage, souvenirRepository);
     }
 
     @AfterMethod
     public void tearDown() {
-        PRODUCERS.deleteOnExit();
-        SOUVENIRS.deleteOnExit();
+//        PRODUCERS.deleteOnExit();
+//        SOUVENIRS.deleteOnExit();
     }
 
 
@@ -61,8 +63,8 @@ public class ProducerRepositoryTest {
         Producer uaProducer = ProducerProvider.getProducer();
         Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
 
-        repository.save(uaProducer);
-        repository.save(ukProducer);
+        producerRepository.save(uaProducer);
+        producerRepository.save(ukProducer);
 
         List<Producer> savedProducers = getSavedProducers();
         Producer savedUaProducer = savedProducers.get(0);
@@ -78,7 +80,7 @@ public class ProducerRepositoryTest {
     public void testSaveAllProducerSaving() throws IOException {
         int number = 100_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
+        producerRepository.saveAll(producers);
         assertThat(getSavedProducers()).isEqualTo(producers);
     }
 
@@ -88,8 +90,8 @@ public class ProducerRepositoryTest {
         int number = 100_000;
         Producer producer = ProducerProvider.getProducerWithSouvenirsId();
         List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
-        repository.save(producer);
+        producerRepository.saveAll(producers);
+        producerRepository.save(producer);
         producers.add(producer);
         assertThat(getSavedProducers()).isEqualTo(producers);
     }
@@ -100,7 +102,7 @@ public class ProducerRepositoryTest {
         int number = 100_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
         long startSaveAll = System.currentTimeMillis();
-        repository.saveAll(producers);
+        producerRepository.saveAll(producers);
         long endSaveAll = System.currentTimeMillis();
         assertThat(endSaveAll - startSaveAll).isLessThan(1000);
     }
@@ -111,9 +113,9 @@ public class ProducerRepositoryTest {
         int number = 100_000;
         Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
         List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
+        producerRepository.saveAll(producers);
         long startSaveLast = System.currentTimeMillis();
-        repository.save(ukProducer);
+        producerRepository.save(ukProducer);
         long endSaveLast = System.currentTimeMillis();
         assertThat(endSaveLast - startSaveLast).isLessThan(1000);
     }
@@ -123,8 +125,8 @@ public class ProducerRepositoryTest {
     public void testGetAll() {
         int number = 100_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
-        assertThat(repository.getAll()).isEqualTo(producers);
+        producerRepository.saveAll(producers);
+        assertThat(producerRepository.getAll()).isEqualTo(producers);
     }
 
 
@@ -132,9 +134,9 @@ public class ProducerRepositoryTest {
     public void testGetById() {
         int number = 10;
         List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
+        producerRepository.saveAll(producers);
         Producer defaultProducerEntity = producers.get(number/2);
-        Producer expected = repository.getById(defaultProducerEntity.getId()).orElseThrow();
+        Producer expected = producerRepository.getById(defaultProducerEntity.getId()).orElseThrow();
         assertThat(expected).isEqualTo(defaultProducerEntity);
     }
 
@@ -143,23 +145,41 @@ public class ProducerRepositoryTest {
     public void testGetByIdNotFound() {
         int number = 10;
         List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
-        assertThat(repository.getById(UUID.randomUUID())).isEmpty();
+        producerRepository.saveAll(producers);
+        assertThat(producerRepository.getById(UUID.randomUUID())).isEmpty();
     }
 
 
     @Test
-    public void testDelete() {
-        int number = 10;
-        List<Producer> producers = ProducerProvider.getProducers(number);
-        repository.saveAll(producers);
-        Producer toDelete = producers.get(number/2);
-        repository.delete(toDelete.getId());
-        List<Producer> afterRemoving = repository.getAll();
+    public void testDeleteProducerRemoved() {
+        int producers = 2;
+        int souvenirsInProducer = 2;
+        initSouvenirRepository();
 
-        assertThat(afterRemoving)
+        Producer toDelete = ProducerAndSouvenirProvider.initStoragesAndGetProducer(producers, souvenirsInProducer,
+                producerRepository, souvenirRepository);
+
+        producerRepository.delete(toDelete.getId());
+
+        assertThat(producerRepository.getAll())
                 .doesNotContain(toDelete)
-                .size().isEqualTo(number - 1);
+                 .size().isEqualTo(producers - 1);
+    }
+
+    @Test
+    public void testDeleteSouvenirsRemoved() {
+        int producers = 2;
+        int souvenirsInProducer = 2;
+        initSouvenirRepository();
+
+        Producer toDelete = ProducerAndSouvenirProvider.initStoragesAndGetProducer(producers, souvenirsInProducer,
+                producerRepository, souvenirRepository);
+
+        producerRepository.delete(toDelete.getId());
+
+        assertThat(souvenirRepository.getAll())
+                .doesNotContainAnyElementsOf(toDelete.getSouvenirs())
+                .size().isEqualTo(producers * souvenirsInProducer - toDelete.getSouvenirs().size());
     }
 
 
@@ -168,9 +188,9 @@ public class ProducerRepositoryTest {
         int number = 10;
         double price = 10;
         List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
-        repository.saveAll(producers);
+        producerRepository.saveAll(producers);
         saveSouvenirs(producers);
-        assertThat(repository.getByPriceLessThan(price)).isEqualTo(getProducersWithPriceLessThan(producers, price));
+        assertThat(producerRepository.getByPriceLessThan(price)).isEqualTo(getProducersWithPriceLessThan(producers, price));
     }
 
 
@@ -181,12 +201,37 @@ public class ProducerRepositoryTest {
         int number = 1;
         double price = 10;
         List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
-        repository.saveAll(producers);
+        producerRepository.saveAll(producers);
         saveSouvenirs(producers);
-        assertThat(repository.getByPriceLessThan(price))
+        assertThat(producerRepository.getByPriceLessThan(price))
                 .isEqualTo(getProducersWithPriceLessThan(producers, price))
                 .isEmpty();
     }
+
+
+//    @Test
+//    public void testDeleteAll() {
+//        int producers = 20;
+//        int souvenirsInProducer = 20;
+//        initSouvenirRepository();
+//
+//        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStorages(producers, souvenirsInProducer,
+//                producerRepository, souvenirRepository);
+//
+//
+//        producerRepository.deleteAll(listToDelete);
+//
+//        assertThat(producerRepository.getAll())
+//                .doesNotContainAnyElementsOf(listToDelete)
+//                .size().isEqualTo(producers * souvenirsInProducer - listToDelete.size());
+//    }
+
+
+
+
+
+
+
 
     private static List<Producer> getProducersWithPriceLessThan(List<Producer> producers, double price) {
         return producers.stream()
@@ -208,7 +253,7 @@ public class ProducerRepositoryTest {
     private void initSouvenirRepository() {
         when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
         new Document<Souvenir>(souvenirStorage).create();
-        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
+//        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
     }
 
 
