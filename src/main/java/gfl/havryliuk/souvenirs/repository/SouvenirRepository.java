@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -14,32 +13,43 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class SouvenirRepository implements Repository<Souvenir> {
-    private final Document<Souvenir> souvenirDocument;
-    private final Document<Producer> producerDocument;
     private final Mapper mapper;
+    private final ProducerRepository producerRepository;
+    private final Document<Souvenir> souvenirDocument;
 
-    public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerFileStorage producerStorage) {
-        this.souvenirDocument = new Document<>(souvenirStorage);
-        this.producerDocument = new Document<>(producerStorage);
+    public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerRepository producerRepository) {
         this.mapper = Mapper.getMapper();
+        this.producerRepository = producerRepository;
+        this.souvenirDocument = new Document<>(souvenirStorage);
+    }
+
+    Document<Souvenir> getSouvenirDocument() {
+        return souvenirDocument;
     }
 
     @Override
     public void save(Souvenir souvenir) {
-        ArrayNode document = souvenirDocument.getRecords();
-        document.add(mapper.valueToTree(souvenir));
-        souvenirDocument.saveRecords(document);
+        producerRepository.isAllProducersStored(souvenir.getProducer().getId());
+        ArrayNode souvenirArray = souvenirDocument.getRecords();
+        removeSouvenir(souvenir.getId(), souvenirArray);
+        souvenirArray.add(mapper.valueToTree(souvenir));
+        souvenirDocument.saveRecords(souvenirArray);
     }
-
 
 
     public void saveAll(List<Souvenir> souvenirs) {
-        ArrayNode document = souvenirDocument.getRecords();
+        UUID[] producerIdToStore = souvenirs.stream()
+                .map(s -> s.getProducer().getId())
+                .toArray(UUID[]::new);
+        producerRepository.isAllProducersStored(producerIdToStore);
+        ArrayNode souvenirArray = souvenirDocument.getRecords();
+        removeSouvenirs(souvenirs, souvenirArray);
         for (Souvenir souvenir : souvenirs) {
-            document.add(mapper.valueToTree(souvenir));
+            souvenirArray.add(mapper.valueToTree(souvenir));
         }
-        souvenirDocument.saveRecords(document);
+        souvenirDocument.saveRecords(souvenirArray);
     }
+
 
     @Override
     public List<Souvenir> getAll() {
@@ -67,7 +77,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
             ArrayNode souvenirArray = souvenirDocument.getRecords();
             removeSouvenir(id, souvenirArray);
             souvenirDocument.saveRecords(souvenirArray);
-
+            Document<Producer> producerDocument = producerRepository.getProducerDocument();
             ArrayNode producerArray = producerDocument.getRecords();
             removeSouvenirIdFromProducers(id, producerArray);
             producerDocument.saveRecords(producerArray);
@@ -99,21 +109,22 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
 
     public void deleteAll(List<Souvenir> souvenirs) {
-        ArrayNode souvenirNodes = souvenirDocument.getRecords();
-        removeSouvenirs(souvenirs, souvenirNodes);
-        souvenirDocument.saveRecords(souvenirNodes);
+        ArrayNode souvenirArray = souvenirDocument.getRecords();
+        removeSouvenirs(souvenirs, souvenirArray);
+        souvenirDocument.saveRecords(souvenirArray);
+
+        Document<Producer> producerDocument = producerRepository.getProducerDocument();
 
         ArrayNode producerArray = producerDocument.getRecords();
         removeAllSouvenirsIdFromProducers(souvenirs, producerArray);
         producerDocument.saveRecords(producerArray);
     }
 
-
-//    void deleteAllWithoutProducer(List<Souvenir> souvenirs) {
-//        ArrayNode souvenirNodes = souvenirDocument.getRecords();
-//        removeSouvenirs(souvenirs, souvenirNodes);
-//        souvenirDocument.saveRecords(souvenirNodes);
-//    }
+    void deleteAllWithoutProducer(List<Souvenir> souvenirs) {
+        ArrayNode souvenirArray = souvenirDocument.getRecords();
+        removeSouvenirs(souvenirs, souvenirArray);
+        souvenirDocument.saveRecords(souvenirArray);
+    }
 
 
 
@@ -149,18 +160,12 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
-    void deleteAllWithoutProducer(List<Souvenir> souvenirs) {
-        ArrayNode souvenirNodes = souvenirDocument.getRecords();
-        removeSouvenirs(souvenirs, souvenirNodes);
-        souvenirDocument.saveRecords(souvenirNodes);
-    }
-
-    private void removeSouvenirs(List<Souvenir> souvenirs, ArrayNode souvenirNodes) {
+    private void removeSouvenirs(List<Souvenir> souvenirs, ArrayNode souvenirArray) {
         List<UUID> souvenirsId = souvenirs.stream()
                 .map(Souvenir::getId)
                 .toList();
 
-        Iterator<JsonNode> souvenirElements = souvenirNodes.elements();
+        Iterator<JsonNode> souvenirElements = souvenirArray.elements();
         while (souvenirElements.hasNext()) {
             JsonNode souvenirNode = souvenirElements.next();
             Souvenir souvenir = mapper.mapEntity(souvenirNode, Souvenir.class);
@@ -169,6 +174,12 @@ public class SouvenirRepository implements Repository<Souvenir> {
             }
         }
     }
+
+//    boolean exists(UUID id) {
+//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+//                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+//                .anyMatch(producer -> producer.getId().equals(id));
+//    }
 
 
 }

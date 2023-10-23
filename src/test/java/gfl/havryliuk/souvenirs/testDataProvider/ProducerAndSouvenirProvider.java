@@ -53,11 +53,11 @@ public class ProducerAndSouvenirProvider {
             List<Souvenir> souvenirs = SouvenirProvider.getSouvenirs(souvenirsInProducer, producer);
             producer.setSouvenirs(souvenirs);
             toDelete.add(souvenirs.get(i));
-            allSouvenirs.addAll(souvenirs);
             allProducers.add(producer);
+            allSouvenirs.addAll(souvenirs);
         }
-        souvenirRepository.saveAll(allSouvenirs);
         producerRepository.saveAll(allProducers);
+        souvenirRepository.saveAll(allSouvenirs);
     }
 
 

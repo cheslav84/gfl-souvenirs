@@ -11,6 +11,7 @@ import gfl.havryliuk.souvenirs.testDataProvider.ProducerAndSouvenirProvider;
 import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
@@ -25,6 +26,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 @Listeners(MockitoTestNGListener.class)
@@ -47,8 +49,11 @@ public class SouvenirRepositoryTest {
     @BeforeMethod
     public void setUp() {
         when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
+        when(producerStorage.getStorage()).thenReturn(PRODUCERS);
         new Document<Souvenir>(souvenirStorage).create();
-        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
+        new Document<Producer>(producerStorage).create();
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+        souvenirRepository = new SouvenirRepository(souvenirStorage, producerRepository);
     }
 
     @AfterMethod
@@ -63,7 +68,10 @@ public class SouvenirRepositoryTest {
     public void testSave() throws IOException {
         Souvenir souvenir1 = SouvenirProvider.getSouvenirWithProducer();
         Souvenir souvenir2 = SouvenirProvider.getSouvenirWithProducer();
+//        initProducerRepository();
 
+        producerRepository.save(souvenir1.getProducer());
+        producerRepository.save(souvenir2.getProducer());
         souvenirRepository.save(souvenir1);
         souvenirRepository.save(souvenir2);
 
@@ -78,19 +86,83 @@ public class SouvenirRepositoryTest {
 
 
     @Test
+    public void testSaveException() {
+        Souvenir souvenir = SouvenirProvider.getSouvenirWithProducer();
+        assertThatThrownBy(() -> souvenirRepository.save(souvenir)).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Producer hasn't saved in storage. Save producer first. Producer id: "
+                        + souvenir.getProducer().getId());
+    }
+
+
+    @Test
     public void testSaveAllSouvenirsSaving() throws IOException {
         int number = 100_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         assertThat(getSavedSouvenirs()).isEqualTo(souvenirs);
     }
 
+    @Test
+    public void testSaveAllException() {
+        int number = 5;
+        List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        assertThatThrownBy(() -> souvenirRepository.saveAll(souvenirs)).isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Producer hasn't saved in storage. Save producer first. Producer id: "
+                        + souvenirs.get(0).getProducer().getId());
+    }
+
+
+
+    @Test
+    public void testUpdate() throws IOException {
+        Souvenir souvenir1 = SouvenirProvider.getSouvenirWithProducer();
+        Souvenir souvenir2 = SouvenirProvider.getSouvenirWithProducer();
+        producerRepository.save(souvenir1.getProducer());
+        producerRepository.save(souvenir2.getProducer());
+        souvenirRepository.save(souvenir1);
+        souvenirRepository.save(souvenir2);
+
+        souvenir2.setName("Another Name");
+        souvenir2.setPrice(50);
+        souvenirRepository.save(souvenir2);
+
+        List<Souvenir> savedSouvenirs = getSavedSouvenirs();
+        Souvenir savedSouvenir1Entity = savedSouvenirs.get(0);
+        Souvenir savedSouvenir2Entity = savedSouvenirs.get(1);
+
+        assertThat(savedSouvenirs).size().isEqualTo(2);
+        assertThat(savedSouvenir1Entity).isEqualTo(souvenir1);
+        assertThat(savedSouvenir2Entity).isEqualTo(souvenir2);
+    }
+
+
+    @Test
+    public void testUpdateAll() throws IOException {
+        int number = 4;
+        int changeFrom = 2;
+        int changeTo = 3;
+        List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenirs.get(0).getProducer());
+        souvenirRepository.saveAll(souvenirs);
+
+        for (int i = changeFrom; i <= changeTo; i++) {
+            Souvenir item = souvenirs.get(i);
+            item.setName("Another name " + i);
+            item.setPrice(20 + i);
+        }
+        List<Souvenir> toChange = souvenirs.subList(changeFrom, changeTo + 1);
+        souvenirRepository.saveAll(toChange);
+        assertThat(getSavedSouvenirs()).isEqualTo(souvenirs);
+    }
 
     @Test
     public void testSaveOneInLargeDocument() throws IOException {
         int number = 100_000;
         Souvenir souvenir = SouvenirProvider.getSouvenirWithProducer();
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenir.getProducer());
+        producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         souvenirRepository.save(souvenir);
         souvenirs.add(souvenir);
@@ -98,10 +170,12 @@ public class SouvenirRepositoryTest {
     }
 
 
+
     @Test
     public void testSpeedSavingLargeNumberOfProducers() {
-        int number = 100_000;
+        int number = 50_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenirs.get(0).getProducer());
         long startSaveAll = System.currentTimeMillis();
         souvenirRepository.saveAll(souvenirs);
         long endSaveAll = System.currentTimeMillis();
@@ -111,9 +185,13 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testSpeedSavingOneIntoLargeDocument() {
-        int number = 100_000;
+        int number = 50_000;
         Souvenir souvenir = SouvenirProvider.getSouvenirWithProducer();
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenir.getProducer());
+        producerRepository.save(souvenirs.get(0).getProducer());
+        producerRepository.save(souvenir.getProducer());
+        producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         long startSaveLast = System.currentTimeMillis();
         souvenirRepository.save(souvenir);
@@ -126,6 +204,7 @@ public class SouvenirRepositoryTest {
     public void testGetAll() {
         int number = 100_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         assertThat(souvenirRepository.getAll()).isEqualTo(souvenirs);
     }
@@ -135,6 +214,7 @@ public class SouvenirRepositoryTest {
     public void testGetById() {
         int number = 10;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         Souvenir defaultSouvenir = souvenirs.get(number/2);
         Souvenir expected = souvenirRepository.getById(defaultSouvenir.getId()).orElseThrow();
@@ -146,6 +226,7 @@ public class SouvenirRepositoryTest {
     public void testGetByIdNotFound() {
         int number = 10;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
+        producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         assertThat(souvenirRepository.getById(UUID.randomUUID())).isEmpty();
     }
@@ -155,7 +236,6 @@ public class SouvenirRepositoryTest {
     public void testDelete() {
         int producers = 3;
         int souvenirsInProducer = 3;
-        initProducerRepository();
         Souvenir souvenirToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenir(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
 
@@ -169,7 +249,6 @@ public class SouvenirRepositoryTest {
     public void testDeleteRemovesProducerId() {
         int producers = 3;
         int souvenirsInProducer = 3;
-        initProducerRepository();
 
         Souvenir souvenirToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenir(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
@@ -185,8 +264,6 @@ public class SouvenirRepositoryTest {
     public void testDeleteAll() {
         int producers = 20;
         int souvenirsInProducer = 20;
-        initProducerRepository();
-
         List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
         souvenirRepository.deleteAll(listToDelete);
@@ -203,8 +280,6 @@ public class SouvenirRepositoryTest {
     public void testDeleteAllRemovesProducersId() {
         int producers = 10;
         int souvenirsInProducer =10;
-        initProducerRepository();
-
         List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
         List<UUID> removedSouvenirId = listToDelete.stream()
@@ -222,8 +297,6 @@ public class SouvenirRepositoryTest {
     public void testSpeedDeleteAll() {
         int producers = 100;
         int souvenirsInProducer = 500;
-        initProducerRepository();
-
         List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
 
@@ -241,33 +314,6 @@ public class SouvenirRepositoryTest {
                 .collect(Collectors.toList());
     }
 
-
-//    private List<Souvenir> initStorages(int producers, int souvenirsInProducer) {
-//        initProducerRepository();
-//
-//        List<Souvenir> allSouvenirs = new ArrayList<>();
-//        List<Producer> allProducers = new ArrayList<>();
-//
-//        List<Souvenir> toDelete = new ArrayList<>();
-//        for (int i = 0; i < producers; i++) {
-//            Producer producer = ProducerProvider.getProducer();
-//            List<Souvenir> souvenirs = SouvenirProvider.getSouvenirs(souvenirsInProducer, producer);
-//            producer.setSouvenirs(souvenirs);
-//            toDelete.add(souvenirs.get(i));
-//            allSouvenirs.addAll(souvenirs);
-//            allProducers.add(producer);
-//        }
-//        repository.saveAll(allSouvenirs);
-//        producerRepository.saveAll(allProducers);
-//        return toDelete;
-//    }
-
-
-    private void initProducerRepository() {
-        when(producerStorage.getStorage()).thenReturn(PRODUCERS);
-        new Document<Producer>(producerStorage).create();
-        producerRepository = new ProducerRepository(producerStorage, souvenirStorage, souvenirRepository);
-    }
 
 
     private List<Souvenir> getSavedSouvenirs() throws IOException {

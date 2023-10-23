@@ -12,12 +12,15 @@ public class SouvenirProvider {
 
 
     public static Souvenir getSouvenirWithProducer() {
-        return new Souvenir(
+        Producer producer = ProducerProvider.getProducerWithOnlyId();
+        Souvenir souvenir = new Souvenir(
                 "Tea cup",
                 80.99,
                 LocalDateTime.parse("2018-12-30T19:34:50.63"),
-                ProducerProvider.getProducerWithOnlyId()
+                producer
         );
+        producer.getSouvenirs().add(souvenir);
+        return souvenir;
     }
 
     public static Souvenir getSouvenir(Producer producer) {
@@ -39,10 +42,13 @@ public class SouvenirProvider {
     }
 
     public static List<Souvenir> getSouvenirsWithProducer(int number) {
+        Producer producer = ProducerProvider.getProducer();
         List<Souvenir> souvenirs = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
-            souvenirs.add(getSouvenirWithProducer());
+//            souvenirs.add(getSouvenirWithProducer());
+            souvenirs.add(getSouvenir(producer));
         }
+        producer.setSouvenirs(souvenirs);
         return souvenirs;
     }
 

@@ -8,6 +8,7 @@ import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerAndSouvenirProvider;
 import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
+import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
 import org.mockito.Mock;
@@ -46,9 +47,11 @@ public class ProducerRepositoryTest {
     @BeforeMethod
     public void setUp() {
         when(producerStorage.getStorage()).thenReturn(PRODUCERS);
+        when(souvenirStorage.getStorage()).thenReturn(SOUVENIRS);
         new Document<Producer>(producerStorage).create();
-        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
-        producerRepository = new ProducerRepository(producerStorage, souvenirStorage, souvenirRepository);
+        new Document<Souvenir>(souvenirStorage).create();
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+        souvenirRepository = new SouvenirRepository(souvenirStorage, producerRepository);
     }
 
     @AfterMethod
@@ -122,6 +125,48 @@ public class ProducerRepositoryTest {
 
 
     @Test
+    public void testUpdate() throws IOException {
+        Producer uaProducer = ProducerProvider.getProducer();
+        Producer ukProducer = ProducerProvider.getProducerWithSouvenirsId();
+
+        producerRepository.save(uaProducer);
+        producerRepository.save(ukProducer);
+
+        ukProducer.setCountry("England");
+        ukProducer.getSouvenirs().add(SouvenirProvider.getSouvenirWithProducer());
+        producerRepository.save(ukProducer);
+
+        List<Producer> savedProducers = getSavedProducers();
+        Producer savedUaProducer = savedProducers.get(0);
+        Producer savedUkProducer = savedProducers.get(1);
+
+        assertThat(savedProducers).size().isEqualTo(2);
+        assertThat(savedUaProducer).isEqualTo(uaProducer);
+        assertThat(savedUkProducer).isEqualTo(ukProducer);
+    }
+
+
+    @Test
+    public void testUpdateAll() throws IOException {
+        int number = 4;
+        int changeFrom = 2;
+        int changeTo = 3;
+        List<Producer> producers = ProducerProvider.getProducers(number);
+
+        producerRepository.saveAll(producers);
+
+        for (int i = changeFrom; i <= changeTo; i++) {
+            Producer item = producers.get(i);
+            item.setName("Another name " + i);
+            item.setCountry("Another country" + i);
+        }
+
+        List<Producer> toChange = producers.subList(changeFrom, changeTo + 1);
+        producerRepository.saveAll(toChange);
+        assertThat(getSavedProducers()).isEqualTo(producers);
+    }
+
+    @Test
     public void testGetAll() {
         int number = 100_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
@@ -154,11 +199,9 @@ public class ProducerRepositoryTest {
     public void testDeleteProducerRemoved() {
         int producers = 2;
         int souvenirsInProducer = 2;
-        initSouvenirRepository();
-
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         Producer toDelete = ProducerAndSouvenirProvider.initStoragesAndGetProducer(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
-
         producerRepository.delete(toDelete.getId());
 
         assertThat(producerRepository.getAll())
@@ -170,8 +213,7 @@ public class ProducerRepositoryTest {
     public void testDeleteSouvenirsRemoved() {
         int producers = 2;
         int souvenirsInProducer = 2;
-        initSouvenirRepository();
-
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         Producer toDelete = ProducerAndSouvenirProvider.initStoragesAndGetProducer(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
 
@@ -188,6 +230,7 @@ public class ProducerRepositoryTest {
         int number = 10;
         double price = 10;
         List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
         saveSouvenirs(producers);
         assertThat(producerRepository.getByPriceLessThan(price)).isEqualTo(getProducersWithPriceLessThan(producers, price));
@@ -198,9 +241,12 @@ public class ProducerRepositoryTest {
     public void getByPriceEmptyList() {
         // Ціна непарних виробників товару у тестовому List<Producer> getProducerWithSouvenirPrices буде зазначена
         // як вища за вказану у тесті. Як наслілок - буде створений List лише з одним виробником та вищою ціною.
+
+
         int number = 1;
         double price = 10;
         List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
         saveSouvenirs(producers);
         assertThat(producerRepository.getByPriceLessThan(price))

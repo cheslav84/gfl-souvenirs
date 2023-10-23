@@ -23,6 +23,7 @@ public class ProducerProvider {
     public static Producer getProducerWithOnlyId() {
         Producer producer = new Producer();
         producer.setId(UUID.randomUUID());
+        producer.setSouvenirs(new ArrayList<>());
         return producer;
     }
 
