@@ -97,6 +97,8 @@ public class ProducerAndSouvenirProvider {
             toReturn.add(souvenirs.get(i));
             allProducers.add(producer);
             allSouvenirs.addAll(souvenirs);
+
+
         }
         producerRepository.saveAll(allProducers);
 //        souvenirRepository.saveAll(allSouvenirs);

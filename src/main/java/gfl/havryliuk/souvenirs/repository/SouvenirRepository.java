@@ -96,6 +96,14 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     }
 
+//    - Для кожного року вивести список сувенірів, зроблених цього року.
+
+    public Map<Integer, List<Souvenir>> getSouvenirsGropedByProductionYear() {
+        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+                .collect(Collectors.groupingBy(s -> s.getProductionDate().getYear()));
+    }
+
 
     @Override
     public void delete(UUID id) {

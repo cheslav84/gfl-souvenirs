@@ -23,6 +23,7 @@ import org.testng.annotations.Test;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -354,7 +355,20 @@ public class SouvenirRepositoryTest {
     }
 
 
+    @Test
+    public void testGetSouvenirsGropedByProductionYear() {
+        int producers = 8;
+        int souvenirsInProducer = 8;
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
 
+        ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
+                producerRepository, souvenirRepository);
+
+        Map<Integer, List<Souvenir>> souvenirsGropedByProductionYear = souvenirRepository.getSouvenirsGropedByProductionYear();
+        for (int i = 0; i < souvenirsInProducer; i++) {
+            assertThat(souvenirsGropedByProductionYear.get(2000 + i).size()).isEqualTo(souvenirsInProducer);
+        }
+    }
 
 
 
@@ -371,4 +385,5 @@ public class SouvenirRepositoryTest {
         return mapper.readValue(SOUVENIRS, new TypeReference<>() {});
     }
 
- }
+
+}

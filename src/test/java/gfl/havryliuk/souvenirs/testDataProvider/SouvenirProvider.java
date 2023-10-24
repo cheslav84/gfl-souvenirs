@@ -27,18 +27,17 @@ public class SouvenirProvider {
         return new Souvenir("Tea cup",80.99,  LocalDateTime.parse("2014-12-30T00:00:00"), producer);
     }
 
-
-    public static Souvenir getSouvenirWithOnlyId() {
-        Souvenir souvenir = new Souvenir();
-        souvenir.setId(UUID.randomUUID());
-        return souvenir;
-    }
+//
+//    public static Souvenir getSouvenirWithOnlyId() {
+//        Souvenir souvenir = new Souvenir();
+//        souvenir.setId(UUID.randomUUID());
+//        return souvenir;
+//    }
 
     public static List<Souvenir> getSouvenirsWithProducer(int number) {
         Producer producer = ProducerProvider.getProducer();
         List<Souvenir> souvenirs = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
-//            souvenirs.add(getSouvenirWithProducer());
             souvenirs.add(getSouvenir(producer));
         }
         producer.setSouvenirs(souvenirs);
@@ -48,7 +47,16 @@ public class SouvenirProvider {
     public static List<Souvenir> getSouvenirs(int number, Producer producer) {
         List<Souvenir> souvenirs = new ArrayList<>(number);
         for (int i = 0; i < number; i++) {
-            souvenirs.add(getSouvenir(producer));
+            Souvenir souvenir = getSouvenir(producer);
+            String year = switch (i / 10) {
+                case 0 -> "200" + i;
+                case 1 -> "20" + i;
+                case 2 -> "2" + i;
+                case 3 -> "" + i;
+                default -> throw new IllegalStateException("Unexpected value: " + i);
+            };
+            souvenir.setProductionDate(LocalDateTime.parse(year + "-12-30T00:00:00"));
+            souvenirs.add(souvenir);
         }
         return souvenirs;
     }
