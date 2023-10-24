@@ -1,30 +1,28 @@
 package gfl.havryliuk.souvenirs.entities;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import lombok.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
+
 
 @Getter
 @Setter
 @NoArgsConstructor
-public class Producer implements Cloneable {
+@AllArgsConstructor
+public class Producer {
 
-//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private String name;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private String country;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE)
+
+    @JsonIgnoreProperties(value = {"name", "price", "productionDate", "producer" }, allowSetters = true)
     private List<Souvenir> souvenirs;
 
     public Producer(String name, String country) {
@@ -34,14 +32,30 @@ public class Producer implements Cloneable {
         this.souvenirs = new ArrayList<>();
     }
 
-    public Producer (Producer producer) {
-        this.id = producer.getId();
-        this.name = producer.getName();
-        this.country = producer.getCountry();
-        this.souvenirs = producer.souvenirs.stream()
-                .map(s -> new Souvenir(s.getId()))
-                .collect(Collectors.toList());
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Producer producer = (Producer) o;
+
+        if (!Objects.equals(id, producer.id)) return false;
+        if (!Objects.equals(name, producer.name)) return false;
+        if (!Objects.equals(country, producer.country)) return false;
+
+
+        return true;
+//        return Objects.equals(souvenirs, producer.souvenirs);
     }
 
+    @Override
+    public int hashCode() {
+        int result = id != null ? id.hashCode() : 0;
+        result = 31 * result + (name != null ? name.hashCode() : 0);
+        result = 31 * result + (country != null ? country.hashCode() : 0);
+//        result = 31 * result + (souvenirs != null ? souvenirs.hashCode() : 0);
+        return result;
+    }
 
 }

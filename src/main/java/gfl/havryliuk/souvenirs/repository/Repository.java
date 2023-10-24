@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface Repository<T>  {
+public interface Repository<T>  {//todo зробити абстрактиний клас
     void save(final T item);
     List<T> getAll();
     Optional<T> getById(UUID id);
