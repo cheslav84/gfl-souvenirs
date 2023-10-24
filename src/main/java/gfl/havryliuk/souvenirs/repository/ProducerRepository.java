@@ -10,7 +10,7 @@ import gfl.havryliuk.souvenirs.util.json.Mapper;
 
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.function.Function;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -18,13 +18,11 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
     private final Mapper mapper;
     private final SouvenirRepository souvenirRepository;
     private final Document<Producer> producerDocument;
-//    private final Document<Souvenir> souvenirDocument;
 
     public ProducerRepository(ProducerFileStorage producerStorage, SouvenirRepository souvenirRepository) {
         this.mapper = Mapper.getMapper();
         this.souvenirRepository = souvenirRepository;
         this.producerDocument = new Document<>(producerStorage);
-//        this.souvenirDocument = souvenirRepository.getSouvenirDocument();
     }
 
     Document<Producer> getProducerDocument() {
@@ -60,28 +58,6 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
     }
 
 
-    // Вивести інформацію про виробників, чиї ціни на сувеніри менше заданої.
-    public List<Producer> getByPriceLessThan(double price) {
-
-        return StreamSupport.stream(producerDocument.getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Producer.class))
-                .filter(p -> getProducersId(price).stream()
-                        .map(Producer::getId)
-                        .anyMatch(id -> id.equals(p.getId())))
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private List<Producer> getProducersId(double price) {
-        return StreamSupport.stream(souvenirRepository.getSouvenirDocument().getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(s -> s.getPrice() < price)
-                .map(Souvenir::getProducer)
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-
     // Вивести інформацію по всіх виробниках та, для кожного виробника вивести інформацію про всі сувеніри, які він виробляє.
     public List<Producer> getProducersWithSouvenirs() {
         Map<UUID, List<Souvenir>> producerSouvenirs = StreamSupport
@@ -93,16 +69,64 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
         return producers;
     }
 
+    // Вивести інформацію про виробників, чиї ціни на сувеніри менше заданої.
+    public List<Producer> getByPriceLessThan(double price) {
+        return findProducers(filterBySouvenirPrice(price));
+    }
+
 
     //Вивести інформацію про виробників заданого сувеніру, виробленого у заданому року.
-    public List<Producer> getProducersBySouvenirAndProductionYear(Souvenir souvenir, LocalDateTime productionDate) {
-//        return StreamSupport.stream(souvenirRepository.getSouvenirDocument().getSpliterator(), false)
-//                .map((node) -> mapper.mapEntity(node, Souvenir.class))
-//                .filter(s -> s.getPrice() < price)
-//                .map(Souvenir::getProducer)
-//                .distinct()
-//                .collect(Collectors.toList());
-        return null;
+    public List<Producer> getProducersBySouvenirAndProductionYear(String souvenirName, String productionYear) {
+        return findProducers(filterBySouvenirNameAndProductionYear(souvenirName, productionYear));
+    }
+
+
+    private List<Producer> findProducers(Predicate<Producer> searchCondition) {
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Producer.class))
+                .filter(searchCondition)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+    private List<UUID> findProducersId(Predicate<Souvenir> searchCondition) {
+        return StreamSupport.stream(souvenirRepository.getSouvenirDocument().getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+                .filter(searchCondition)
+                .map(Souvenir::getProducer)
+                .map(Producer::getId)
+                .distinct()
+                .collect(Collectors.toList());
+    }
+
+
+    private Predicate<Producer> filterBySouvenirPrice(double price) {
+        return p -> getProducersId(price).stream()
+                .anyMatch(id -> id.equals(p.getId()));
+    }
+
+    private Predicate<Producer> filterBySouvenirNameAndProductionYear(String souvenirName, String productionYear) {
+        return p -> getProducersId(souvenirName, productionYear).stream()
+                .anyMatch(id -> id.equals(p.getId()));
+    }
+
+
+    private List<UUID> getProducersId(String name, String productionYear) {
+        LocalDateTime year = LocalDateTime.parse(productionYear + "-01-01T00:00:00.00");
+        return findProducersId(filterByNameAndYear(name, year));
+    }
+
+    private List<UUID> getProducersId(double price) {
+        return findProducersId(filterByPrice(price));
+    }
+
+
+    private Predicate<Souvenir> filterByPrice(double price) {
+        return s -> s.getPrice() < price;
+    }
+
+    private Predicate<Souvenir> filterByNameAndYear(String name, LocalDateTime year) {
+        return s -> s.getName().equals(name) && s.getProductionDate().getYear() == year.getYear();
     }
 
 
@@ -137,21 +161,7 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
         }
     }
 
-    boolean isAllProducersStored(UUID... idArr) {
-        List<UUID> uuidList = new ArrayList<>(Arrays.stream(idArr).toList());
-        List<UUID> storedProducersId = StreamSupport.stream(producerDocument.getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Producer.class))
-                .map(Producer::getId)
-                .toList();
 
-        for (UUID producerId : uuidList) {
-            if (!storedProducersId.contains(producerId)) {
-                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: " + producerId);//todo не зовсім вірно подумати як переробити
-            }
-        }
-        return true;
-
-    }
 
 
     private void removeProducer(UUID id, ArrayNode producerArray) {
@@ -165,6 +175,8 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
             }
         }
     }
+
+
 
 
     private void removeProducers(List<Producer> producers, ArrayNode producerArray) {
@@ -182,13 +194,12 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
         }
     }
 
-    List<UUID> getProducersIdByCountry(String country) {
-        return StreamSupport.stream(producerDocument.getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Producer.class))
-                .filter(p -> p.getCountry().equals(country))
-                .map(Producer::getId)
-                .collect(Collectors.toList());
 
+    private Predicate<Producer> condition(List<UUID> producersId, Producer producer) {
+        return s ->  producersId.contains(producer.getId());
     }
+
+
+
 
 }

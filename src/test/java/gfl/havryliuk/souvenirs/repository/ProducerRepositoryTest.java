@@ -242,7 +242,6 @@ public class ProducerRepositoryTest {
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         Producer toDelete = ProducerAndSouvenirProvider.initStoragesAndGetProducer(producers, souvenirsInProducer,
                 producerRepository, souvenirRepository);
-
         producerRepository.delete(toDelete.getId());
 
         assertThat(souvenirRepository.getAll())
@@ -259,6 +258,7 @@ public class ProducerRepositoryTest {
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
         saveSouvenirs(producers);
+
         assertThat(producerRepository.getByPriceLessThan(price))
                 .isEqualTo(getProducersWithPriceLessThan(producers, price));
     }
@@ -268,13 +268,12 @@ public class ProducerRepositoryTest {
     public void testGetByPriceEmptyList() {
         // Ціна непарних виробників товару у тестовому List<Producer> getProducerWithSouvenirPrices буде зазначена
         // як вища за вказану у тесті. Як наслілок - буде створений List лише з одним виробником та вищою ціною.
-
         int number = 1;
         double price = 10;
         List<Producer> producers = ProducerProvider.getProducerWithSouvenirPrices(number, price);
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.saveAll(producers);
-        saveSouvenirs(producers);
+
         assertThat(producerRepository.getByPriceLessThan(price))
                 .isEqualTo(getProducersWithPriceLessThan(producers, price))
                 .isEmpty();
@@ -286,7 +285,6 @@ public class ProducerRepositoryTest {
         int producerAmount = 8;
         int souvenirsInProducer = 8;
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-
         List<Producer> producers = ProducerAndSouvenirProvider
                 .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
 
@@ -295,7 +293,6 @@ public class ProducerRepositoryTest {
                 .withEqualsForFields(evaluator, "souvenirs")
                 .withEqualsForFields(reverseEvaluator, "souvenirs")
                 .isEqualTo(producers);
-
     }
 
     @Test
@@ -303,10 +300,8 @@ public class ProducerRepositoryTest {
         int producerAmount = 8;
         int souvenirsInProducer = 8;
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-
         List<Producer> producers = ProducerAndSouvenirProvider
                 .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
-
         List<Producer> producersWithSouvenirs = producerRepository.getProducersWithSouvenirs();
         List<Souvenir> souvenirs = producersWithSouvenirs.get(0).getSouvenirs();
         souvenirs.add(SouvenirProvider.getSouvenirWithProducer());
@@ -316,10 +311,27 @@ public class ProducerRepositoryTest {
                 .withEqualsForFields(evaluator, "souvenirs")
                 .withEqualsForFields(reverseEvaluator, "souvenirs")
                 .isNotEqualTo(producers);
-
     }
 
-    private static List<Producer> getProducersWithPriceLessThan(List<Producer> producers, double price) {
+
+
+    @Test
+    public void testGetProducersBySouvenirAndProductionYear() {
+        int producerAmount = 8;
+        int souvenirsInProducer = 8;
+        String name = "Nice souvenir";
+        String year = "2023";
+        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
+        List<Producer> producers = ProducerAndSouvenirProvider.initStoragesAndGetProducers(
+                producerAmount, souvenirsInProducer, name, year, producerRepository, souvenirRepository);
+
+        assertThat(producerRepository.getProducersBySouvenirAndProductionYear(name, year))
+                .isEqualTo(producers);
+    }
+
+
+
+    private List<Producer> getProducersWithPriceLessThan(List<Producer> producers, double price) {
         return producers.stream()
                 .filter(p -> p.getSouvenirs().stream()
                         .map(Souvenir::getPrice)
@@ -345,7 +357,5 @@ public class ProducerRepositoryTest {
     private List<Producer> getSavedProducers() throws IOException {
         return mapper.readValue(PRODUCERS, new TypeReference<>(){});
     }
-
-
 
 }

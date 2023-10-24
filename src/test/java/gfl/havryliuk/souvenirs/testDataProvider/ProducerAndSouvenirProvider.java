@@ -5,6 +5,7 @@ import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.repository.ProducerRepository;
 import gfl.havryliuk.souvenirs.repository.SouvenirRepository;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,9 +38,9 @@ public class ProducerAndSouvenirProvider {
                                               SouvenirRepository souvenirRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
         List<Producer> allProducers = new ArrayList<>();
-        List<Souvenir> toReturn = new ArrayList<>();
+        List<Souvenir> stub = new ArrayList<>();
         initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
-                toReturn, allSouvenirs, allProducers);
+                stub, allSouvenirs, allProducers);
         return allProducers;
     }
 
@@ -52,9 +53,42 @@ public class ProducerAndSouvenirProvider {
     }
 
 
+    public static List<Producer> initStoragesAndGetProducers(int producers, int souvenirsInProducer,
+                                                             String name, String year,
+                                                             ProducerRepository producerRepository,
+                                                             SouvenirRepository souvenirRepository) {
+        List<Souvenir> allSouvenirs = new ArrayList<>();
+        List<Producer> allProducers = new ArrayList<>();
+        List<Souvenir> stub = new ArrayList<>();
+        initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
+                stub , allSouvenirs, allProducers);
+
+        List<Producer> toReturn = new ArrayList<>();
+        for (int i = 0; i < allProducers.size(); i++) {
+            if (i % 3 == 0) {
+                Producer currentProducer = allProducers.get(i);
+                List<Souvenir> souvenirs = currentProducer.getSouvenirs();
+                for (int j = 0; j < souvenirs.size(); j++) {
+                    if (j % 3 == 0) {
+                        Souvenir currentSouvenir = souvenirs.get(j);
+                        currentSouvenir.setName(name);
+                        currentSouvenir.setProductionDate(LocalDateTime.parse(year + "-02-02T00:00:00.00"));
+                    }
+                }
+                toReturn.add(currentProducer);
+            }
+        }
+
+        producerRepository.saveAll(toReturn);
+
+
+        return toReturn;
+    }
+
 
     private static void initStorages(int producers, int souvenirsInProducer, ProducerRepository producerRepository,
-                                     SouvenirRepository souvenirRepository, List<Souvenir> toReturn,
+                                     SouvenirRepository souvenirRepository,
+                                     List<Souvenir> toReturn,
                                      List<Souvenir> allSouvenirs, List<Producer> allProducers) {
         for (int i = 0; i < producers; i++) {
             Producer producer = ProducerProvider.getProducer();
@@ -65,7 +99,7 @@ public class ProducerAndSouvenirProvider {
             allSouvenirs.addAll(souvenirs);
         }
         producerRepository.saveAll(allProducers);
-        souvenirRepository.saveAll(allSouvenirs);
+//        souvenirRepository.saveAll(allSouvenirs);
     }
 
 

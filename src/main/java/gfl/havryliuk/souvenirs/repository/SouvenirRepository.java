@@ -29,7 +29,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     @Override
     public void save(Souvenir souvenir) {
-        producerRepository.isAllProducersStored(souvenir.getProducer().getId());
+        checkIfAllProducersSaved(souvenir.getProducer().getId());
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenir(souvenir.getId(), souvenirArray);
         souvenirArray.add(mapper.valueToTree(souvenir));
@@ -41,7 +41,8 @@ public class SouvenirRepository implements Repository<Souvenir> {
         UUID[] producerIdToStore = souvenirs.stream()
                 .map(s -> s.getProducer().getId())
                 .toArray(UUID[]::new);
-        producerRepository.isAllProducersStored(producerIdToStore);
+
+        checkIfAllProducersSaved(producerIdToStore);
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenirs(souvenirs, souvenirArray);//todo подумати, може не видаляти а замінювати,
         for (Souvenir souvenir : souvenirs) {
@@ -77,7 +78,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
     public List<Souvenir> getByCountry(String country) {
-        List<UUID> producersIdByCountry = producerRepository.getProducersIdByCountry(country);
+        List<UUID> producersIdByCountry = getProducersIdByCountry(country);
 
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
@@ -86,9 +87,14 @@ public class SouvenirRepository implements Repository<Souvenir> {
                 .collect(Collectors.toList());
     }
 
+    private List<UUID> getProducersIdByCountry(String country) {
+        return StreamSupport.stream(producerRepository.getProducerDocument().getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Producer.class))
+                .filter(p -> p.getCountry().equals(country))
+                .map(Producer::getId)
+                .collect(Collectors.toList());
 
-
-
+    }
 
 
     @Override
@@ -196,11 +202,21 @@ public class SouvenirRepository implements Repository<Souvenir> {
         }
     }
 
-//    boolean exists(UUID id) {
-//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
-//                .map((node) -> mapper.mapEntity(node, Souvenir.class))
-//                .anyMatch(producer -> producer.getId().equals(id));
-//    }
+
+    private void checkIfAllProducersSaved(UUID... idArr) {
+        List<UUID> uuidList = new ArrayList<>(Arrays.stream(idArr).toList());
+        List<UUID> storedProducersId = StreamSupport.stream(producerRepository.getProducerDocument().getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Producer.class))
+                .map(Producer::getId)
+                .toList();
+
+        for (UUID producerId : uuidList) {
+            if (!storedProducersId.contains(producerId)) {
+                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: " + producerId);//todo не зовсім вірно подумати як переробити
+            }
+        }
+    }
+
 
 
 }

@@ -16,7 +16,7 @@ public class SouvenirProvider {
         Souvenir souvenir = new Souvenir(
                 "Tea cup",
                 80.99,
-                LocalDateTime.parse("2018-12-30T19:34:50.63"),
+                LocalDateTime.parse("2018-12-30T00:00:00"),
                 producer
         );
         producer.getSouvenirs().add(souvenir);
@@ -24,14 +24,7 @@ public class SouvenirProvider {
     }
 
     public static Souvenir getSouvenir(Producer producer) {
-        LocalDateTime date = LocalDateTime.of(2014, 12, 20, 2, 30);
-
-        return new Souvenir(
-                "Tea cup",
-                80.99,
-                date,
-                producer
-        );
+        return new Souvenir("Tea cup",80.99,  LocalDateTime.parse("2014-12-30T00:00:00"), producer);
     }
 
 
