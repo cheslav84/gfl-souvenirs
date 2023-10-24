@@ -51,9 +51,9 @@ public class SouvenirProvider {
             String year = switch (i / 10) {
                 case 0 -> "200" + i;
                 case 1 -> "20" + i;
-                case 2 -> "2" + i;
-                case 3 -> "" + i;
-                default -> throw new IllegalStateException("Unexpected value: " + i);
+                case 2 -> "20" + i;
+                case 3 -> "20" + i;
+                default -> "2014";
             };
             souvenir.setProductionDate(LocalDateTime.parse(year + "-12-30T00:00:00"));
             souvenirs.add(souvenir);

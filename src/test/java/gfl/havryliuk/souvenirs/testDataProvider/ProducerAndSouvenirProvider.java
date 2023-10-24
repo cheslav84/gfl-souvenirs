@@ -101,7 +101,6 @@ public class ProducerAndSouvenirProvider {
 
         }
         producerRepository.saveAll(allProducers);
-//        souvenirRepository.saveAll(allSouvenirs);
     }
 
 
