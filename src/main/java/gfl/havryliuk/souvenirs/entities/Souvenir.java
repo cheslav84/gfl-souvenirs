@@ -45,8 +45,7 @@ public class Souvenir {
         if (Double.compare(price, souvenir.price) != 0) return false;
         if (!Objects.equals(id, souvenir.id)) return false;
         if (!Objects.equals(name, souvenir.name)) return false;
-        if (!Objects.equals(productionDate, souvenir.productionDate))
-            return false;
+        if (!Objects.equals(productionDate, souvenir.productionDate)) return false;
         return Objects.equals(producer.getId(), souvenir.producer.getId());
     }
 

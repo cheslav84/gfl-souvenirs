@@ -1,39 +1,27 @@
 package gfl.havryliuk.souvenirs.entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIdentityReference;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 
 @Getter
 @Setter
 @NoArgsConstructor
-//@JsonIgnoreProperties(ignoreUnknown = true)
+@AllArgsConstructor
 public class Producer {
 
-//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private UUID id;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private String name;
 
-//    @JsonProperty(access = JsonProperty.Access.READ_WRITE, required = true)
     private String country;
 
 
-//    @JsonIdentityInfo(generator= ObjectIdGenerators.PropertyGenerator.class, property="id")
-//    @JsonIdentityReference(alwaysAsId=true)
     @JsonIgnoreProperties(value = {"name", "price", "productionDate", "producer" }, allowSetters = true)
     private List<Souvenir> souvenirs;
 
@@ -43,6 +31,7 @@ public class Producer {
         this.country = country;
         this.souvenirs = new ArrayList<>();
     }
+
 
     @Override
     public boolean equals(Object o) {
@@ -68,4 +57,5 @@ public class Producer {
 //        result = 31 * result + (souvenirs != null ? souvenirs.hashCode() : 0);
         return result;
     }
+
 }

@@ -8,7 +8,9 @@ import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
 
+import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -80,6 +82,31 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
     }
 
 
+    // Вивести інформацію по всіх виробниках та, для кожного виробника вивести інформацію про всі сувеніри, які він виробляє.
+    public List<Producer> getProducersWithSouvenirs() {
+        Map<UUID, List<Souvenir>> producerSouvenirs = StreamSupport
+                .stream(souvenirRepository.getSouvenirDocument().getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+                .collect(Collectors.groupingBy(s -> s.getProducer().getId()));
+        List<Producer> producers = getAll();
+        producers.forEach(p -> p.setSouvenirs(producerSouvenirs.get(p.getId())));
+        return producers;
+    }
+
+
+    //Вивести інформацію про виробників заданого сувеніру, виробленого у заданому року.
+    public List<Producer> getProducersBySouvenirAndProductionYear(Souvenir souvenir, LocalDateTime productionDate) {
+//        return StreamSupport.stream(souvenirRepository.getSouvenirDocument().getSpliterator(), false)
+//                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+//                .filter(s -> s.getPrice() < price)
+//                .map(Souvenir::getProducer)
+//                .distinct()
+//                .collect(Collectors.toList());
+        return null;
+    }
+
+
+
     @Override
     public Optional<Producer> getById(UUID id) {
         return StreamSupport.stream(producerDocument.getSpliterator(), false)
@@ -119,7 +146,7 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
 
         for (UUID producerId : uuidList) {
             if (!storedProducersId.contains(producerId)) {
-                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: " + producerId);
+                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: " + producerId);//todo не зовсім вірно подумати як переробити
             }
         }
         return true;
