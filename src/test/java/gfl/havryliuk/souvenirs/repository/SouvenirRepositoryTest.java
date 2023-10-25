@@ -12,7 +12,6 @@ import gfl.havryliuk.souvenirs.testDataProvider.ProducerProvider;
 import gfl.havryliuk.souvenirs.testDataProvider.SouvenirProvider;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.testng.MockitoTestNGListener;
 import org.testng.annotations.AfterMethod;
@@ -60,8 +59,8 @@ public class SouvenirRepositoryTest {
 
     @AfterMethod
     public void tearDown() {
-//        SOUVENIRS.deleteOnExit();
-//        PRODUCERS.deleteOnExit();
+        SOUVENIRS.deleteOnExit();
+        PRODUCERS.deleteOnExit();
     }
 
 
@@ -70,7 +69,6 @@ public class SouvenirRepositoryTest {
     public void testSave() throws IOException {
         Souvenir souvenir1 = SouvenirProvider.getSouvenirWithProducer();
         Souvenir souvenir2 = SouvenirProvider.getSouvenirWithProducer();
-//        initProducerRepository();
 
         producerRepository.save(souvenir1.getProducer());
         producerRepository.save(souvenir2.getProducer());

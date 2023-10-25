@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -61,4 +62,13 @@ public class Souvenir {
         result = 31 * result + (producer.getId() != null ? producer.getId().hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Souvenir" +
+                " with name '" + name + '\'' +
+                ", costs ₴" + price +
+                ", was produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\n";
+    }
 }
+

@@ -15,13 +15,11 @@ import java.util.stream.StreamSupport;
 
 public class SouvenirRepository implements Repository<Souvenir> {
     private final Mapper mapper;
-//    private final ProducerRepository producerRepository;
     private final Document<Souvenir> souvenirDocument;
     private final Document<Producer> producerDocument;
 
     public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerFileStorage producerStorage) {
         this.mapper = Mapper.getMapper();
-//        this.producerRepository = producerRepository;
         this.souvenirDocument = new Document<>(souvenirStorage);
         this.producerDocument = new Document<>(producerStorage);
     }

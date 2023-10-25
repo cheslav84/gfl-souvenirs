@@ -1,18 +1,15 @@
-package gfl.havryliuk.souvenirs.presenter.menu;
+package gfl.havryliuk.souvenirs.presenter;
 
+import gfl.havryliuk.souvenirs.util.ConsoleReader;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 @Slf4j
-public class Menu {
-//    private static final BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
-
+public class MenuBuilder {
 
     @SneakyThrows
-    public static int buildMenu(String[] names) {
+    public static int build(String[] names) {
         int userChoice = -1;
         do {
             log.debug("Choose the option: ");

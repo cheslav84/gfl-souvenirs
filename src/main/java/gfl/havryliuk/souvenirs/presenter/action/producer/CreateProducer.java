@@ -1,8 +1,9 @@
 package gfl.havryliuk.souvenirs.presenter.action.producer;
 
 import gfl.havryliuk.souvenirs.entities.Producer;
-import gfl.havryliuk.souvenirs.presenter.Action;
-import gfl.havryliuk.souvenirs.presenter.menu.ConsoleReader;
+import gfl.havryliuk.souvenirs.presenter.action.Action;
+import gfl.havryliuk.souvenirs.presenter.action.menu.ProducerMenu;
+import gfl.havryliuk.souvenirs.util.ConsoleReader;
 import gfl.havryliuk.souvenirs.util.validation.ValidationPattern;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,6 +17,6 @@ public class CreateProducer implements Action {
 
         Producer producer = new Producer(name, country);
         log.info("{} created.", producer);
-        new ProducerActions().execute();
+        new ProducerMenu().execute();
     }
 }

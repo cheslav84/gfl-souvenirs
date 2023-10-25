@@ -25,9 +25,6 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
         this.producerDocument = new Document<>(producerStorage);
     }
 
-    Document<Producer> getProducerDocument() {
-        return producerDocument;
-    }
 
     @Override
     public void save(Producer producer) {
@@ -193,12 +190,6 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
             }
         }
     }
-
-
-    private Predicate<Producer> condition(List<UUID> producersId, Producer producer) {
-        return s ->  producersId.contains(producer.getId());
-    }
-
 
 
 

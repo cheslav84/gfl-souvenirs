@@ -3,7 +3,6 @@ package gfl.havryliuk.souvenirs.testDataProvider;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.repository.ProducerRepository;
-import gfl.havryliuk.souvenirs.repository.SouvenirRepository;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;

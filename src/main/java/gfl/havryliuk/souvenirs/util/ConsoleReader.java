@@ -1,4 +1,4 @@
-package gfl.havryliuk.souvenirs.presenter.menu;
+package gfl.havryliuk.souvenirs.util;
 
 import gfl.havryliuk.souvenirs.util.validation.ValidationPattern;
 import gfl.havryliuk.souvenirs.util.validation.Validator;
@@ -9,7 +9,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 
 @Slf4j
-public final class ConsoleReader {//todo move class
+public final class ConsoleReader {
     private static final BufferedReader READER = new BufferedReader(new InputStreamReader(System.in));
 
     @SneakyThrows
