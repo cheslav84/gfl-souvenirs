@@ -58,4 +58,10 @@ public class Producer {
         return result;
     }
 
+    @Override
+    public String toString() {
+        return "Producer " +
+                " with name '" + name + '\'' +
+                ", from '" + country + '\'';
+    }
 }
