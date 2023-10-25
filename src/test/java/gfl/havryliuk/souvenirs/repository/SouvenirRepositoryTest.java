@@ -54,8 +54,8 @@ public class SouvenirRepositoryTest {
         when(producerStorage.getStorage()).thenReturn(PRODUCERS);
         new Document<Souvenir>(souvenirStorage).create();
         new Document<Producer>(producerStorage).create();
+        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-        souvenirRepository = new SouvenirRepository(souvenirStorage, producerRepository);
     }
 
     @AfterMethod
@@ -177,7 +177,6 @@ public class SouvenirRepositoryTest {
     public void testSpeedSavingLargeNumberOfProducers() {
         int number = 10_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.save(souvenirs.get(0).getProducer());
         long startSaveAll = System.currentTimeMillis();
         souvenirRepository.saveAll(souvenirs);
@@ -191,7 +190,6 @@ public class SouvenirRepositoryTest {
         int number = 10_000;
         Souvenir souvenir = SouvenirProvider.getSouvenirWithProducer();
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.save(souvenir.getProducer());
         producerRepository.save(souvenirs.get(0).getProducer());
         producerRepository.save(souvenir.getProducer());
@@ -208,7 +206,6 @@ public class SouvenirRepositoryTest {
     public void testGetAll() {
         int number = 25_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         assertThat(souvenirRepository.getAll()).isEqualTo(souvenirs);
@@ -231,7 +228,6 @@ public class SouvenirRepositoryTest {
     public void testGetByIdNotFound() {
         int number = 10;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
         assertThat(souvenirRepository.getById(UUID.randomUUID())).isEmpty();
@@ -242,10 +238,8 @@ public class SouvenirRepositoryTest {
     public void testDelete() {
         int producers = 3;
         int souvenirsInProducer = 3;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-
-        Souvenir souvenirToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenir(producers, souvenirsInProducer,
-                producerRepository, souvenirRepository);
+        Souvenir souvenirToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenir(producers,
+                souvenirsInProducer, producerRepository);
 
         souvenirRepository.delete(souvenirToDelete.getId());
         assertThat(souvenirRepository.getAll())
@@ -257,9 +251,8 @@ public class SouvenirRepositoryTest {
     public void testDeleteRemovesProducerId() {
         int producers = 3;
         int souvenirsInProducer = 3;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-        Souvenir souvenirToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenir(producers, souvenirsInProducer,
-                producerRepository, souvenirRepository);
+        Souvenir souvenirToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenir(producers,
+                souvenirsInProducer, producerRepository);
 
         souvenirRepository.delete(souvenirToDelete.getId());
         assertThat(getProducerSouvenirsId())
@@ -268,17 +261,12 @@ public class SouvenirRepositoryTest {
     }
 
 
-
-
-
-
     @Test
     public void testDeleteAll() {
         int producers = 20;
         int souvenirsInProducer = 20;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
-                producerRepository, souvenirRepository);
+        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers,
+                souvenirsInProducer, producerRepository);
         souvenirRepository.deleteAll(listToDelete);
 
         assertThat(souvenirRepository.getAll())
@@ -291,9 +279,8 @@ public class SouvenirRepositoryTest {
     public void testDeleteAllRemovesProducersId() {
         int producers = 10;
         int souvenirsInProducer =10;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
-                producerRepository, souvenirRepository);
+        List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers,
+                souvenirsInProducer, producerRepository);
         List<UUID> removedSouvenirId = listToDelete.stream()
                 .map(Souvenir::getId)
                 .collect(Collectors.toList());
@@ -309,9 +296,8 @@ public class SouvenirRepositoryTest {
     public void testSpeedDeleteAll() {
         int producers = 100;
         int souvenirsInProducer = 500;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         List<Souvenir> listToDelete = ProducerAndSouvenirProvider
-                .initStoragesAndGetSouvenirs(producers, souvenirsInProducer, producerRepository, souvenirRepository);
+                .initStoragesAndGetSouvenirs(producers, souvenirsInProducer, producerRepository);
 
         long beforeDeleting = System.currentTimeMillis();
         souvenirRepository.deleteAll(listToDelete);
@@ -324,9 +310,8 @@ public class SouvenirRepositoryTest {
     public void testGetByProducer() {
         int producerAmount = 20;
         int souvenirsInProducer = 20;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         List<Producer> producers = ProducerAndSouvenirProvider
-                .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
+                .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository);
 
         assertThat(souvenirRepository.getByProducer(producers.get(producerAmount/2)))
                 .isEqualTo(producers.get(producerAmount/2).getSouvenirs());
@@ -338,9 +323,8 @@ public class SouvenirRepositoryTest {
         int producerAmount = 8;
         int souvenirsInProducer = 8;
         String searchedCountry = "US";
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
         List<Producer> producers = ProducerAndSouvenirProvider
-                .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository, souvenirRepository);
+                .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository);
 
         List<Producer> USProducers = ProducerProvider.setCountry(producers, producerAmount / 2, searchedCountry);
 
@@ -359,17 +343,13 @@ public class SouvenirRepositoryTest {
     public void testGetSouvenirsGropedByProductionYear() {
         int producers = 8;
         int souvenirsInProducer = 8;
-        producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
-
-        ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer,
-                producerRepository, souvenirRepository);
-
-        Map<Integer, List<Souvenir>> souvenirsGropedByProductionYear = souvenirRepository.getSouvenirsGropedByProductionYear();
+        ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers, souvenirsInProducer, producerRepository);
+        Map<Integer, List<Souvenir>> souvenirsGropedByProductionYear = souvenirRepository
+                .getSouvenirsGropedByProductionYear();
         for (int i = 0; i < souvenirsInProducer; i++) {
             assertThat(souvenirsGropedByProductionYear.get(2000 + i).size()).isEqualTo(souvenirsInProducer);
         }
     }
-
 
 
 

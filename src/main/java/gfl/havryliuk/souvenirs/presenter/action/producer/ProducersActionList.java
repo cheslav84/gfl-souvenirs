@@ -3,10 +3,6 @@ package gfl.havryliuk.souvenirs.presenter.action.producer;
 import gfl.havryliuk.souvenirs.presenter.Action;
 import gfl.havryliuk.souvenirs.presenter.action.Exit;
 import gfl.havryliuk.souvenirs.presenter.action.MainAction;
-import gfl.havryliuk.souvenirs.presenter.action.souvenir.CreateSouvenir;
-import gfl.havryliuk.souvenirs.presenter.action.souvenir.DeleteSouvenir;
-import gfl.havryliuk.souvenirs.presenter.action.souvenir.UpdateSouvenir;
-import gfl.havryliuk.souvenirs.service.Service;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
+import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
@@ -14,13 +15,15 @@ import java.util.stream.StreamSupport;
 
 public class SouvenirRepository implements Repository<Souvenir> {
     private final Mapper mapper;
-    private final ProducerRepository producerRepository;
+//    private final ProducerRepository producerRepository;
     private final Document<Souvenir> souvenirDocument;
+    private final Document<Producer> producerDocument;
 
-    public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerRepository producerRepository) {
+    public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerFileStorage producerStorage) {
         this.mapper = Mapper.getMapper();
-        this.producerRepository = producerRepository;
+//        this.producerRepository = producerRepository;
         this.souvenirDocument = new Document<>(souvenirStorage);
+        this.producerDocument = new Document<>(producerStorage);
     }
 
     Document<Souvenir> getSouvenirDocument() {
@@ -88,7 +91,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
     private List<UUID> getProducersIdByCountry(String country) {
-        return StreamSupport.stream(producerRepository.getProducerDocument().getSpliterator(), false)
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
                 .filter(p -> p.getCountry().equals(country))
                 .map(Producer::getId)
@@ -112,7 +115,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
             ArrayNode souvenirArray = souvenirDocument.getRecords();
             removeSouvenir(id, souvenirArray);
             souvenirDocument.saveRecords(souvenirArray);
-            Document<Producer> producerDocument = producerRepository.getProducerDocument();
+//            Document<Producer> producerDocument = producerRepository.getProducerDocument();
             ArrayNode producerArray = producerDocument.getRecords();
             removeSouvenirIdFromProducers(id, producerArray);
             producerDocument.saveRecords(producerArray);
@@ -147,8 +150,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenirs(souvenirs, souvenirArray);
         souvenirDocument.saveRecords(souvenirArray);
-
-        Document<Producer> producerDocument = producerRepository.getProducerDocument();
+//        Document<Producer> producerDocument = producerRepository.getProducerDocument();
 
         ArrayNode producerArray = producerDocument.getRecords();
         removeAllSouvenirsIdFromProducers(souvenirs, producerArray);
@@ -213,14 +215,15 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     private void checkIfAllProducersSaved(UUID... idArr) {
         List<UUID> uuidList = new ArrayList<>(Arrays.stream(idArr).toList());
-        List<UUID> storedProducersId = StreamSupport.stream(producerRepository.getProducerDocument().getSpliterator(), false)
+        List<UUID> storedProducersId = StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
                 .map(Producer::getId)
                 .toList();
 
         for (UUID producerId : uuidList) {
             if (!storedProducersId.contains(producerId)) {
-                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: " + producerId);//todo не зовсім вірно подумати як переробити
+                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: "
+                        + producerId);//todo не зовсім вірно подумати як переробити
             }
         }
     }

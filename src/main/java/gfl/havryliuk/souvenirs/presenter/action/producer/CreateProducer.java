@@ -11,8 +11,8 @@ public class CreateProducer implements Action {
 
     @Override
     public void execute() {
-        String name = ConsoleReader.readString("producer name", ValidationPattern.NAME_OR_COUNTRY);
-        String country = ConsoleReader.readString("country", ValidationPattern.NAME_OR_COUNTRY);
+        String name = ConsoleReader.readString("producer name", ValidationPattern.NAME);
+        String country = ConsoleReader.readString("country", ValidationPattern.COUNTRY);
 
         Producer producer = new Producer(name, country);
         log.info("{} created.", producer);

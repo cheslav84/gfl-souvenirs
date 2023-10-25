@@ -12,21 +12,19 @@ import java.util.List;
 public class ProducerAndSouvenirProvider {
 
     public static List<Souvenir> initStoragesAndGetSouvenirs(int producers, int souvenirsInProducer,
-                                                             ProducerRepository producerRepository,
-                                                             SouvenirRepository souvenirRepository) {
+                                                             ProducerRepository producerRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
         List<Producer> allProducers = new ArrayList<>();
         List<Souvenir> toReturn = new ArrayList<>();
-        initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
+        initStorages(producers, souvenirsInProducer, producerRepository,
                 toReturn, allSouvenirs, allProducers);
         return toReturn;
     }
 
     public static Souvenir initStoragesAndGetSouvenir(int producers, int souvenirsInProducer,
-                                                             ProducerRepository producerRepository,
-                                                             SouvenirRepository souvenirRepository) {
+                                                             ProducerRepository producerRepository) {
 
-        return initStoragesAndGetSouvenirs(producers, souvenirsInProducer, producerRepository, souvenirRepository)
+        return initStoragesAndGetSouvenirs(producers, souvenirsInProducer, producerRepository)
                 .get(0);
     }
 
@@ -34,33 +32,30 @@ public class ProducerAndSouvenirProvider {
 
 
     public static List<Producer> initStoragesAndGetProducers(int producers, int souvenirsInProducer,
-                                              ProducerRepository producerRepository,
-                                              SouvenirRepository souvenirRepository) {
+                                              ProducerRepository producerRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
         List<Producer> allProducers = new ArrayList<>();
         List<Souvenir> stub = new ArrayList<>();
-        initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
+        initStorages(producers, souvenirsInProducer, producerRepository,
                 stub, allSouvenirs, allProducers);
         return allProducers;
     }
 
 
     public static Producer initStoragesAndGetProducer(int producers, int souvenirsInProducer,
-                                                      ProducerRepository producerRepository,
-                                                      SouvenirRepository souvenirRepository) {
-        return initStoragesAndGetProducers(producers, souvenirsInProducer, producerRepository, souvenirRepository)
+                                                      ProducerRepository producerRepository) {
+        return initStoragesAndGetProducers(producers, souvenirsInProducer, producerRepository)
                 .get(producers/2);
     }
 
 
     public static List<Producer> initStoragesAndGetProducers(int producers, int souvenirsInProducer,
                                                              String name, String year,
-                                                             ProducerRepository producerRepository,
-                                                             SouvenirRepository souvenirRepository) {
+                                                             ProducerRepository producerRepository) {
         List<Souvenir> allSouvenirs = new ArrayList<>();
         List<Producer> allProducers = new ArrayList<>();
         List<Souvenir> stub = new ArrayList<>();
-        initStorages(producers, souvenirsInProducer, producerRepository, souvenirRepository,
+        initStorages(producers, souvenirsInProducer, producerRepository,
                 stub , allSouvenirs, allProducers);
 
         List<Producer> toReturn = new ArrayList<>();
@@ -87,9 +82,7 @@ public class ProducerAndSouvenirProvider {
 
 
     private static void initStorages(int producers, int souvenirsInProducer, ProducerRepository producerRepository,
-                                     SouvenirRepository souvenirRepository,
-                                     List<Souvenir> toReturn,
-                                     List<Souvenir> allSouvenirs, List<Producer> allProducers) {
+                                     List<Souvenir> toReturn, List<Souvenir> allSouvenirs, List<Producer> allProducers){
         for (int i = 0; i < producers; i++) {
             Producer producer = ProducerProvider.getProducer();
             List<Souvenir> souvenirs = SouvenirProvider.getSouvenirs(souvenirsInProducer, producer);

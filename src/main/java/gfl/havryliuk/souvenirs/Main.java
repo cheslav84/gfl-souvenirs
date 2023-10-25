@@ -2,17 +2,11 @@ package gfl.havryliuk.souvenirs;
 
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.presenter.MainActionList;
-import gfl.havryliuk.souvenirs.presenter.action.Exit;
 import gfl.havryliuk.souvenirs.presenter.action.MainAction;
-import gfl.havryliuk.souvenirs.presenter.menu.Menu;
-import gfl.havryliuk.souvenirs.service.Service;
 import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Slf4j
 public class Main {
