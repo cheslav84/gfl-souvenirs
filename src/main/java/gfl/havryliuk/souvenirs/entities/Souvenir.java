@@ -13,8 +13,6 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-//@JsonIgnoreProperties(ignoreUnknown = true)
-
 public class Souvenir {
     private UUID id;
 
@@ -28,7 +26,7 @@ public class Souvenir {
     private Producer producer;
 
     public Souvenir(String name, double price, LocalDateTime productionDate, Producer producer) {
-        this.id = UUID.randomUUID();;
+        this.id = UUID.randomUUID();
         this.name = name;
         this.price = price;
         this.productionDate = productionDate;

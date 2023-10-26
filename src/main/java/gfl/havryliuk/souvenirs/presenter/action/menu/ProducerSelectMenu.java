@@ -2,14 +2,12 @@ package gfl.havryliuk.souvenirs.presenter.action.menu;
 
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 import gfl.havryliuk.souvenirs.presenter.action.Exit;
-import gfl.havryliuk.souvenirs.presenter.action.producer.CreateProducer;
-import gfl.havryliuk.souvenirs.presenter.action.producer.DeleteProducer;
-import gfl.havryliuk.souvenirs.presenter.action.producer.UpdateProducer;
+import gfl.havryliuk.souvenirs.presenter.action.producer.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 
-public class ProducerMenu extends MenuTemplate {
+public class ProducerSelectMenu extends MenuTemplate {
 
     public void setActionList() {
         actionList = ActionList.values();
@@ -19,10 +17,11 @@ public class ProducerMenu extends MenuTemplate {
     @AllArgsConstructor
     private enum ActionList implements MenuAction {
         EXIT("End the program", new Exit()),
-        CREATE_PRODUCER("Create producer", new CreateProducer()),
-        UPDATE_PRODUCER("Update producer", new UpdateProducer()),
-        DELETE_PRODUCER("Delete producer", new DeleteProducer()),
-        SELECT_OPTIONS("Select options", new ProducerSelectMenu()),
+        ALL("Display all producers", new DisplayAllProducers()),
+        ALL_WITH_SOUVENIRS("Display all producers with their souvenirs", new DisplayAllWithSouvenirs()),
+        BY_PRICE_LESS_THAN("Display producers by price less than", new DisplayByPriceLessThan()),
+        DELETE_PRODUCER("Display producers by souvenir and production year", new DisplayBySouvenirAndProductionYear()),
+        PRODUCER_MENU("Producer menu", new ProducerMenu()),
         MAIN_MENU("Main menu", new MainMenu());
 
         private final String description;

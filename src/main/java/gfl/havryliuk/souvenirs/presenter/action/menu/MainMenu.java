@@ -15,8 +15,8 @@ public class MainMenu extends MenuTemplate {//todo спробувати вирі
     @AllArgsConstructor
     private enum ActionList implements MenuAction {//todo команда в команді.
         EXIT("End the program", new Exit()),
-        PRODUCER_ACTIONS("Producer options", new ProducerMenu()),
-        SOUVENIR_ACTIONS("Souvenir options", new SouvenirMenu());
+        PRODUCER_MENU("Producer menu", new ProducerMenu()),
+        SOUVENIR_MENU("Souvenir menu", new SouvenirMenu());
 
         private final String description;
         private final Action action;
