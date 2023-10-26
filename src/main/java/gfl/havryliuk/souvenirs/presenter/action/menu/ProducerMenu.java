@@ -2,28 +2,22 @@ package gfl.havryliuk.souvenirs.presenter.action.menu;
 
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 import gfl.havryliuk.souvenirs.presenter.action.Exit;
-import gfl.havryliuk.souvenirs.presenter.MenuBuilder;
 import gfl.havryliuk.souvenirs.presenter.action.producer.CreateProducer;
 import gfl.havryliuk.souvenirs.presenter.action.producer.DeleteProducer;
 import gfl.havryliuk.souvenirs.presenter.action.producer.UpdateProducer;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.Arrays;
 
-public class ProducerMenu implements Action, Menu {
-    @Override
-    public void execute() {
-        String[] actionNames = Arrays.stream(ActionList.values())
-                .map(ActionList::getName)
-                .toArray(String[]::new);
+public class ProducerMenu extends MenuTemplate {
 
-        ActionList.values()[MenuBuilder.build(actionNames)].perform();
+    public void setActionList() {
+        actionList = ActionList.values();
     }
 
     @Getter
     @AllArgsConstructor
-    private enum ActionList {
+    private enum ActionList implements MenuAction {
         EXIT("End the program", new Exit()),
         CREATE_PRODUCER("Create producer", new CreateProducer()),
         UPDATE_PRODUCER("Update producer", new UpdateProducer()),
@@ -31,10 +25,10 @@ public class ProducerMenu implements Action, Menu {
         SELECT_OPTIONS("Select options", new DeleteProducer()),
         MAIN_MENU("Main menu", new MainMenu());
 
-        private final String name;
+        private final String description;
         private final Action action;
 
-        public void perform() {
+        public void execute() {
             action.execute();
         }
 
