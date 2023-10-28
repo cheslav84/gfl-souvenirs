@@ -8,10 +8,13 @@ import gfl.havryliuk.souvenirs.presenter.action.souvenir.UpdateSouvenir;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class SouvenirMenu extends MenuTemplate {
 
-    public void setActionList() {
-        actionList = ActionList.values();
+    public List<MenuAction> getActionList() {
+        return Arrays.asList(ActionList.values());
     }
 
     @Getter
@@ -24,7 +27,7 @@ public class SouvenirMenu extends MenuTemplate {
         SELECT_OPTIONS("Select options", new SouvenirSelectMenu()),
         MAIN_MENU("Main menu", new MainMenu());
 
-        private final String description;
+        private final String menuItem;
         private final Action action;
 
         public void execute() {

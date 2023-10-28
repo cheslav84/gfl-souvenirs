@@ -1,8 +1,14 @@
 package gfl.havryliuk.souvenirs.presenter.action.menu;
 
+import gfl.havryliuk.souvenirs.entities.Entity;
+import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 import gfl.havryliuk.souvenirs.presenter.action.Exit;
-import gfl.havryliuk.souvenirs.presenter.action.producer.*;
+import gfl.havryliuk.souvenirs.presenter.action.ReturnableAction;
+import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayAllProducers;
+import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayAllWithSouvenirs;
+import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayByPriceLessThan;
+import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayBySouvenirAndProductionYear;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,7 +16,7 @@ import java.util.Arrays;
 import java.util.List;
 
 
-public class ProducerSelectMenu extends MenuTemplate {
+public class ReturnableProducerSelectMenu extends ReturnableMenuTemplate {
 
     public List<MenuAction> getActionList() {
         return Arrays.asList(ActionList.values());
@@ -18,7 +24,7 @@ public class ProducerSelectMenu extends MenuTemplate {
 
     @Getter
     @AllArgsConstructor
-    private enum ActionList implements MenuAction {
+    private enum ActionList implements MenuAction, ReturnableAction {
         EXIT("End the program", new Exit()),
         ALL("Display all producers", new DisplayAllProducers()),
         ALL_WITH_SOUVENIRS("Display all producers with their souvenirs", new DisplayAllWithSouvenirs()),
@@ -33,6 +39,14 @@ public class ProducerSelectMenu extends MenuTemplate {
         public void execute() {
             action.execute();
         }
+        public Entity executeAndReturn() {
+            ReturnableAction returnableAction = null;
+            if (action instanceof ReturnableAction){
+                returnableAction = (ReturnableAction) action;
+            }
+            return returnableAction.executeAndReturn();// todo can be null
+        }
+
 
     }
 }

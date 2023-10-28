@@ -1,18 +1,26 @@
-package gfl.havryliuk.souvenirs.presenter.action.menu;
+package gfl.havryliuk.souvenirs.presenter.action;
 
-import gfl.havryliuk.souvenirs.presenter.action.Action;
-import gfl.havryliuk.souvenirs.presenter.action.Exit;
+import gfl.havryliuk.souvenirs.presenter.action.menu.MenuAction;
+import gfl.havryliuk.souvenirs.presenter.action.menu.MenuTemplate;
+import gfl.havryliuk.souvenirs.presenter.action.menu.ProducerMenu;
+import gfl.havryliuk.souvenirs.presenter.action.menu.SouvenirMenu;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class MainMenu extends MenuTemplate {
+public class UpdateOrDelete extends MenuTemplate {
 
     public List<MenuAction> getActionList() {
         return Arrays.asList(ActionList.values());
     }
+
+
+
+
+
+
 
     @Getter
     @AllArgsConstructor

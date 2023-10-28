@@ -13,7 +13,7 @@ import java.util.UUID;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class Producer {
+public class Producer implements Entity {
 
     private UUID id;
 
@@ -42,11 +42,7 @@ public class Producer {
 
         if (!Objects.equals(id, producer.id)) return false;
         if (!Objects.equals(name, producer.name)) return false;
-        if (!Objects.equals(country, producer.country)) return false;
-
-
-        return true;
-//        return Objects.equals(souvenirs, producer.souvenirs);
+        return (!Objects.equals(country, producer.country));
     }
 
     @Override
@@ -54,13 +50,12 @@ public class Producer {
         int result = id != null ? id.hashCode() : 0;
         result = 31 * result + (name != null ? name.hashCode() : 0);
         result = 31 * result + (country != null ? country.hashCode() : 0);
-//        result = 31 * result + (souvenirs != null ? souvenirs.hashCode() : 0);
         return result;
     }
 
     @Override
     public String toString() {
-        return "Producer " +
+        return "Producer" +
                 " with name '" + name + '\'' +
                 ", from '" + country + '\'';
     }

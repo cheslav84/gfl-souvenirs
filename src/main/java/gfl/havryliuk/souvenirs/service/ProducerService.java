@@ -12,14 +12,18 @@ public class ProducerService {
 
     private final ProducerRepository producerRepository;
 
-    private final SouvenirRepository souvenirRepository;
-
-    public ProducerService(ProducerFileStorage producerStorage, SouvenirFileStorage souvenirStorage) {
-        souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
+    public ProducerService() {
+        ProducerFileStorage producerStorage = new ProducerFileStorage();//todo create factory
+        SouvenirFileStorage souvenirStorage = new SouvenirFileStorage();
+        SouvenirRepository souvenirRepository = new SouvenirRepository(souvenirStorage, producerStorage);
         producerRepository = new ProducerRepository(producerStorage, souvenirRepository);
     }
 
     public void createAll(List<Producer> producers){
         producerRepository.saveAll(producers);
+    }
+
+    public List<Producer> getAll () {
+        return producerRepository.getAll();
     }
 }

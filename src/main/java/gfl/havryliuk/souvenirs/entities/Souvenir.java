@@ -13,7 +13,7 @@ import java.util.UUID;
 @Getter
 @Setter
 @NoArgsConstructor
-public class Souvenir {
+public class Souvenir implements Entity {
     private UUID id;
 
     private String name;

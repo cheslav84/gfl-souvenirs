@@ -3,11 +3,12 @@ package gfl.havryliuk.souvenirs.presenter.action.menu;
 import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.presenter.Menu;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
+import gfl.havryliuk.souvenirs.presenter.action.ReturnableAction;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-public abstract class MenuTemplate implements Action {
+public abstract class ReturnableMenuTemplate implements Action, ReturnableAction {
 
     protected List<MenuAction> actionList;
 
@@ -19,6 +20,15 @@ public abstract class MenuTemplate implements Action {
         Action action = getAction(getMenuItems());
         action.execute();
     }
+
+    @Override
+    public Entity executeAndReturn() {
+        actionList = getActionList();
+        ReturnableAction action = (ReturnableAction) getAction(getMenuItems());
+        return action.executeAndReturn();
+    }
+
+
     protected abstract List<MenuAction> getActionList();
 
     public void setEntity(Entity entity) {

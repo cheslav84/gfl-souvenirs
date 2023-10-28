@@ -1,6 +1,7 @@
 package gfl.havryliuk.souvenirs.presenter.action.menu;
 
-public interface MenuAction {
-    String getDescription();
-    void execute();
+import gfl.havryliuk.souvenirs.presenter.action.Action;
+
+public interface MenuAction extends Action {
+    String getMenuItem();
 }

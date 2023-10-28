@@ -1,14 +1,16 @@
 package gfl.havryliuk.souvenirs.presenter.action.menu;
 
 import gfl.havryliuk.souvenirs.presenter.action.Action;
+import gfl.havryliuk.souvenirs.presenter.action.EmptyAction;
 import gfl.havryliuk.souvenirs.presenter.action.Exit;
+import gfl.havryliuk.souvenirs.presenter.action.init.OnConfirmCreateStorages;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
 
-public class MainMenu extends MenuTemplate {
+public class ConfirmCreateStorages extends MenuTemplate {
 
     public List<MenuAction> getActionList() {
         return Arrays.asList(ActionList.values());
@@ -18,8 +20,8 @@ public class MainMenu extends MenuTemplate {
     @AllArgsConstructor
     private enum ActionList implements MenuAction {
         EXIT("End the program", new Exit()),
-        PRODUCER_MENU("Producer menu", new ProducerMenu()),
-        SOUVENIR_MENU("Souvenir menu", new SouvenirMenu());
+        CREATE_STORAGES("YES", new OnConfirmCreateStorages()),
+        SKIP("NO", new EmptyAction());
 
         private final String menuItem;
         private final Action action;
@@ -28,6 +30,4 @@ public class MainMenu extends MenuTemplate {
             action.execute();
         }
     }
-
 }
-
