@@ -26,6 +26,10 @@ public class SouvenirService {
         return souvenirRepository.getAll();
     }
 
+    public List<Souvenir> getByProducerNameAndCountry(String name, String country){
+        return souvenirRepository.getByProducerNameAndCountry(name, country);
+    }
+
     public void update(Souvenir souvenir) {
         souvenirRepository.save(souvenir);
     }
@@ -40,9 +44,9 @@ public class SouvenirService {
         producerRepository.save(producer);
     }
 
-
-
     public void delete(Souvenir souvenir) {
         souvenirRepository.delete(souvenir.getId());
     }
+
+
 }

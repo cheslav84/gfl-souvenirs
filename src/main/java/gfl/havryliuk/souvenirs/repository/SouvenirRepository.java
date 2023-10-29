@@ -91,20 +91,30 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     }
 
+//    public List<Souvenir> getByProducer(Producer producer) {//change by name and country
+//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+//                .map((node) -> mapper.mapEntity(node, Souvenir.class))
+//                .filter(s -> s.getProducer().getId().equals(producer.getId()))
+//                .collect(Collectors.toList());
+//    }
 
-    public List<Souvenir> getByProducer(Producer producer) {
+    public List<Souvenir> getByProducerNameAndCountry(String name, String country) {//change by name and country
+        List<UUID> producersId = getProducersIdByNameAndCountry(name, country);
+
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(s -> s.getProducer().getId().equals(producer.getId()))
+                .filter(s -> producersId.contains(s.getProducer().getId()))
+                .distinct()
                 .collect(Collectors.toList());
     }
 
+
     public List<Souvenir> getByCountry(String country) {
-        List<UUID> producersIdByCountry = getProducersIdByCountry(country);
+        List<UUID> producersId = getProducersIdByCountry(country);
 
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(s -> producersIdByCountry.contains(s.getProducer().getId()))
+                .filter(s -> producersId.contains(s.getProducer().getId()))
                 .distinct()
                 .collect(Collectors.toList());
     }
@@ -115,8 +125,17 @@ public class SouvenirRepository implements Repository<Souvenir> {
                 .filter(p -> p.getCountry().equals(country))
                 .map(Producer::getId)
                 .collect(Collectors.toList());
-
     }
+
+    private List<UUID> getProducersIdByNameAndCountry(String name, String country) {
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
+                .map((node) -> mapper.mapEntity(node, Producer.class))
+                .filter(p -> p.getName().equals(name))
+                .filter(p -> p.getCountry().equals(country))
+                .map(Producer::getId)
+                .collect(Collectors.toList());
+    }
+
 
 //    - Для кожного року вивести список сувенірів, зроблених цього року.
 

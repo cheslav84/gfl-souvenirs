@@ -12,15 +12,14 @@ import java.util.Optional;
 public class DeleteSouvenir implements Action {
     @Override
     public void execute() {
-        Optional<Souvenir> producerOptional = new ReturnableSouvenirSelectMenu().executeAndReturn();
-        if (producerOptional.isPresent()) {
-            Souvenir souvenir = producerOptional.get();
+        Optional<Souvenir> souvenirOptional = new ReturnableSouvenirSelectMenu().executeAndReturn();
+        if (souvenirOptional.isPresent()) {
+            Souvenir souvenir = souvenirOptional.get();
 
             //todo confirm delete
 
             SouvenirService service = new SouvenirService();
             service.delete(souvenir);
-
             log.info("{} updated.", souvenir);
         } else {
             log.info("Souvenir hasn't been found.");

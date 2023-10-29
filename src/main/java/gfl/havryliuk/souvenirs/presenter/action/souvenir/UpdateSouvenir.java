@@ -16,9 +16,9 @@ import java.util.Optional;
 public class UpdateSouvenir implements Action {
     @Override
     public void execute() {
-        Optional<Souvenir> producerOptional = new ReturnableSouvenirSelectMenu().executeAndReturn();
-        if (producerOptional.isPresent()) {
-            Souvenir souvenir = producerOptional.get();
+        Optional<Souvenir> souvenirOptional = new ReturnableSouvenirSelectMenu().executeAndReturn();
+        if (souvenirOptional.isPresent()) {
+            Souvenir souvenir = souvenirOptional.get();
 
             String name = ConsoleReader.readForUpdatingString(souvenir.getName(), "souvenir name",
                     ValidationPattern.NAME);

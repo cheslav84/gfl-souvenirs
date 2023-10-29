@@ -280,6 +280,7 @@ public class SouvenirRepositoryTest {
         int souvenirsInProducer =10;
         List<Souvenir> listToDelete = ProducerAndSouvenirProvider.initStoragesAndGetSouvenirs(producers,
                 souvenirsInProducer, producerRepository);
+
         List<UUID> removedSouvenirId = listToDelete.stream()
                 .map(Souvenir::getId)
                 .collect(Collectors.toList());
@@ -307,14 +308,24 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testGetByProducer() {
-        int producerAmount = 20;
-        int souvenirsInProducer = 20;
+        int producerAmount = 2;
+        int souvenirsInProducer = 2;
+        String searchedCountry = "US";
+        String searchedName = "Coffee";
         List<Producer> producers = ProducerAndSouvenirProvider
                 .initStoragesAndGetProducers(producerAmount, souvenirsInProducer, producerRepository);
 
-        assertThat(souvenirRepository.getByProducer(producers.get(producerAmount/2)))
-                .isEqualTo(producers.get(producerAmount/2).getSouvenirs());
+        List<Producer> USProducers = ProducerProvider.setCountry(producers, producerAmount / 2, searchedCountry);
+        List<Producer> CoffeeUSProducers = ProducerProvider.setName(USProducers, producerAmount / 2, searchedName);
 
+        List<Souvenir> souvenirs = CoffeeUSProducers.stream()
+                .flatMap(p -> p.getSouvenirs().stream())
+                .collect(Collectors.toList());
+
+        producerRepository.saveAll(producers);
+
+        assertThat(souvenirRepository.getByProducerNameAndCountry(searchedName, searchedCountry))
+                .isEqualTo(souvenirs);
     }
 
     @Test
