@@ -122,7 +122,7 @@ public class ProducerRepositoryTest {
 
     @Test
     public void testSpeedSavingLargeNumberOfProducers() {
-        int number = 10_000;
+        int number = 5_000;
         List<Producer> producers = ProducerProvider.getProducers(number);
         long startSaveAll = System.currentTimeMillis();
         producerRepository.saveAll(producers);

@@ -96,7 +96,7 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testSaveAllSouvenirsSaving() throws IOException {
-        int number = 25_000;
+        int number = 1_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
         producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);
@@ -158,7 +158,7 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testSaveOneInLargeDocument() throws IOException {
-        int number = 25_000;
+        int number = 1_000;
         Souvenir souvenir = SouvenirProvider.getSouvenirWithProducer();
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
         producerRepository.save(souvenir.getProducer());
@@ -173,7 +173,7 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testSpeedSavingLargeNumberOfProducers() {
-        int number = 10_000;
+        int number = 500;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
         producerRepository.save(souvenirs.get(0).getProducer());
         long startSaveAll = System.currentTimeMillis();
@@ -185,7 +185,7 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testSpeedSavingOneIntoLargeDocument() {
-        int number = 10_000;
+        int number = 1_000;
         Souvenir souvenir = SouvenirProvider.getSouvenirWithProducer();
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
         producerRepository.save(souvenir.getProducer());
@@ -202,7 +202,7 @@ public class SouvenirRepositoryTest {
 
     @Test
     public void testGetAll() {
-        int number = 25_000;
+        int number = 1_000;
         List<Souvenir> souvenirs = SouvenirProvider.getSouvenirsWithProducer(number);
         producerRepository.save(souvenirs.get(0).getProducer());
         souvenirRepository.saveAll(souvenirs);

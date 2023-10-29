@@ -32,6 +32,10 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
         removeProducer(producer.getId(), producerArray);
         producerArray.add(mapper.valueToTree(producer));
         producerDocument.saveRecords(producerArray);
+
+
+
+
         souvenirRepository.saveAll(producer.getSouvenirs());
     }
 

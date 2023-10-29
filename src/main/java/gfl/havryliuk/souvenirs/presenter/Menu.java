@@ -28,24 +28,25 @@ public class Menu {
     }
 
     @SneakyThrows
-    public static int showItemsWithEntitiesAndGetAnswer(List<String> items, List<? extends Entity> entities) {
-        log.debug("To select the producer choose it number.");
+    public static int showEntitiesAndGetAnswer(List<? extends Entity> entities, String message) {
+        List<String> items = new ArrayList<>();
         for (int i = 0; i < entities.size(); i++) {
-            items.add(i + 1, entities.get(i).toString());
+            items.add(i, entities.get(i).toString());
         }
+        log.debug("{}", message);
         return showItemsAndGetAnswer(items);
     }
 
-    @SneakyThrows
-    public static int showEntities(List<? extends Entity> entities, String entityType) {
-        List<String> items = new ArrayList<>();
-        items.add("Main menu");
-        for (int i = 0; i < entities.size(); i++) {
-            items.add(i + 1, entities.get(i).toString());
-        }
-        log.debug("To select the {} choose it number, or press 0 to get to the main menu.", entityType);
-        return showItemsAndGetAnswer(items);
+
+    public static void showEntities(List<? extends Entity> entities) {
+        log.debug("{}", entities);
+//        List<String> items = new ArrayList<>();
+//        for (int i = 0; i < entities.size(); i++) {
+//            items.add(i, entities.get(i).toString());
+//        }
+//        buildOptions(items);
     }
+
 
     private static void buildOptions(List<String> names) {
         for (int i = 1; i < names.size(); i++) {

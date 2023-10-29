@@ -37,12 +37,10 @@ public class Producer implements Entity {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-
         Producer producer = (Producer) o;
-
         if (!Objects.equals(id, producer.id)) return false;
         if (!Objects.equals(name, producer.name)) return false;
-        return (!Objects.equals(country, producer.country));
+        return (Objects.equals(country, producer.country));
     }
 
     @Override
@@ -52,6 +50,7 @@ public class Producer implements Entity {
         result = 31 * result + (country != null ? country.hashCode() : 0);
         return result;
     }
+
 
     @Override
     public String toString() {

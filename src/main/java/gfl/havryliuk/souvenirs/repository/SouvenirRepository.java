@@ -45,9 +45,36 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
         checkIfAllProducersSaved(producerIdToStore);
         ArrayNode souvenirArray = souvenirDocument.getRecords();
-        removeSouvenirs(souvenirs, souvenirArray);//todo подумати, може не видаляти а замінювати,
+
+
+//        removeSouvenirs(souvenirs, souvenirArray);//todo подумати, може не видаляти а замінювати,
+//        for (Souvenir souvenir : souvenirs) {
+//            souvenirArray.add(mapper.valueToTree(souvenir));
+//        }
+
+
+
         for (Souvenir souvenir : souvenirs) {
-            souvenirArray.add(mapper.valueToTree(souvenir));
+            Optional<Souvenir> saved = getById(souvenir.getId());
+            if (saved.isEmpty()){
+                souvenirArray.add(mapper.valueToTree(souvenir));
+            } else {
+                Souvenir toSave = new Souvenir();
+                if (souvenir.getName() != null) {
+                    toSave.setName(souvenir.getName());
+                }
+                if (souvenir.getPrice() != 0) {
+                    toSave.setPrice(souvenir.getPrice());
+                }
+                if (souvenir.getProductionDate() != null) {
+                    toSave.setProductionDate(souvenir.getProductionDate());
+                }
+                if (souvenir.getProducer() != null) {
+                    toSave.setProducer(souvenir.getProducer());
+                }
+                removeSouvenir(souvenir.getId(), souvenirArray);
+                souvenirArray.add(mapper.valueToTree(souvenir));
+            }
         }
         souvenirDocument.saveRecords(souvenirArray);
     }
