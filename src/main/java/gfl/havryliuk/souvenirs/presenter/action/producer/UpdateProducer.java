@@ -9,23 +9,29 @@ import gfl.havryliuk.souvenirs.util.validation.ValidationPattern;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.Optional;
+
 @Slf4j
 @Setter
 public class UpdateProducer implements Action {
 
     @Override
     public void execute() {
-        Producer producer = new ReturnableProducerSelectMenu<Producer>().executeAndReturn();
+        Optional<Producer> producerOptional = new ReturnableProducerSelectMenu<Producer>().executeAndReturn();
+        if (producerOptional.isPresent()) {
+            Producer producer = producerOptional.get();
 
-        String name = ConsoleReader.readForUpdatingString(producer.getName(), "producer name", ValidationPattern.NAME);
-        String country = ConsoleReader.readForUpdatingString(producer.getCountry(), "country", ValidationPattern.COUNTRY);
+            String name = ConsoleReader.readForUpdatingString(producer.getName(), "producer name", ValidationPattern.NAME);
+            String country = ConsoleReader.readForUpdatingString(producer.getCountry(), "country", ValidationPattern.COUNTRY);
 
-        producer.setName(name);
-        producer.setCountry(country);
+            producer.setName(name);
+            producer.setCountry(country);
 
-        ProducerService service = new ProducerService();
-        service.update(producer);
-        log.info("{} updated.", producer);
-
+            ProducerService service = new ProducerService();
+            service.update(producer);
+            log.info("{} updated.", producer);
+        } else {
+            log.info("Producer hasn't been found.");
+        }
     }
 }

@@ -1,17 +1,17 @@
-package gfl.havryliuk.souvenirs.presenter.action.producer;
+package gfl.havryliuk.souvenirs.presenter.action;
 
 import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.presenter.Menu;
-import gfl.havryliuk.souvenirs.presenter.action.Action;
-import gfl.havryliuk.souvenirs.presenter.action.ReturnableAction;
+
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
+import java.util.Optional;
 
-    @Slf4j
+@Slf4j
     @Setter
-    public abstract class EntityDisplayer implements Action, ReturnableAction<Entity> {
+    public abstract class EntityDisplayer implements Action, ReturnableAction<Entity> {//todo rename
 
     protected List<? extends Entity> entities;
 
@@ -23,10 +23,15 @@ import java.util.List;
     }
 
     @Override
-    public Entity executeAndReturn() {
+    public Optional<Entity> executeAndReturn() {
         entities = setEntities();//todo обробити якщо не лист пустий
-        int userChoice = Menu.showEntitiesAndGetAnswer(entities, "To choose the producer press the number against it.");
-        return entities.get(userChoice);
+        if(entities.size() != 0) {
+//            throw new IllegalArgumentException("The list is empty.");
+            int userChoice = Menu.showEntitiesAndGetAnswer(entities, "To choose the producer press the number against it.");
+            return Optional.of(entities.get(userChoice));
+        } else {
+            return Optional.empty();
+        }
     }
 
     protected abstract List<? extends Entity> setEntities();

@@ -12,19 +12,21 @@ import lombok.Getter;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 
 public class ReturnableProducerSelectMenu<T extends Entity> extends MenuTemplate implements ReturnableAction<Entity> {
+//public class ReturnableProducerSelectMenu<Optional<T extends Entity>> extends MenuTemplate implements ReturnableAction<Optional<Entity>> {
 
     public List<MenuAction> getActionList() {
         return Arrays.asList(ActionList.values());
     }
 
     @Override
-    public <T extends Entity> T executeAndReturn() {
+    public <T extends Entity> Optional<T> executeAndReturn() {
         actionList = getActionList();
         ReturnableAction action = (ReturnableAction) getAction(getMenuItems());
-        return (T) action.executeAndReturn();
+        return action.executeAndReturn();
     }
 
     @Getter
@@ -33,7 +35,7 @@ public class ReturnableProducerSelectMenu<T extends Entity> extends MenuTemplate
         ALL("Display all producers", new DisplayAllProducers()),
         ALL_WITH_SOUVENIRS("Display all producers with their souvenirs", new DisplayAllWithSouvenirs()),
         BY_PRICE_LESS_THAN("Display producers by price less than", new DisplayByPriceLessThan()),
-        DELETE_PRODUCER("Display producers by souvenir and production year", new DisplayBySouvenirAndProductionYear());
+        BY_SOUVENIR_AND_PRODUCTION_YEAR("Display producers by souvenir and production year", new DisplayBySouvenirAndProductionYear());
 
         private final String menuItem;
         private final Action action;
@@ -42,7 +44,7 @@ public class ReturnableProducerSelectMenu<T extends Entity> extends MenuTemplate
             action.execute();
         }
 
-        public Entity executeAndReturn() {
+        public <T extends Entity> Optional<T> executeAndReturn() {
             ReturnableAction returnableAction;
             if (action instanceof ReturnableAction){
                 returnableAction = (ReturnableAction) action;

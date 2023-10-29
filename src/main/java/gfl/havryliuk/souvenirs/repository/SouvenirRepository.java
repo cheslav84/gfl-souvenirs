@@ -34,6 +34,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenir(souvenir.getId(), souvenirArray);
         souvenirArray.add(mapper.valueToTree(souvenir));
+        updateSouvenir(souvenir, souvenirArray);
         souvenirDocument.saveRecords(souvenirArray);
     }
 
@@ -46,37 +47,31 @@ public class SouvenirRepository implements Repository<Souvenir> {
         checkIfAllProducersSaved(producerIdToStore);
         ArrayNode souvenirArray = souvenirDocument.getRecords();
 
-
-//        removeSouvenirs(souvenirs, souvenirArray);//todo подумати, може не видаляти а замінювати,
-//        for (Souvenir souvenir : souvenirs) {
-//            souvenirArray.add(mapper.valueToTree(souvenir));
-//        }
-
-
-
         for (Souvenir souvenir : souvenirs) {
-            Optional<Souvenir> saved = getById(souvenir.getId());
-            if (saved.isEmpty()){
-                souvenirArray.add(mapper.valueToTree(souvenir));
-            } else {
-                Souvenir toSave = new Souvenir();
-                if (souvenir.getName() != null) {
-                    toSave.setName(souvenir.getName());
-                }
-                if (souvenir.getPrice() != 0) {
-                    toSave.setPrice(souvenir.getPrice());
-                }
-                if (souvenir.getProductionDate() != null) {
-                    toSave.setProductionDate(souvenir.getProductionDate());
-                }
-                if (souvenir.getProducer() != null) {
-                    toSave.setProducer(souvenir.getProducer());
-                }
-                removeSouvenir(souvenir.getId(), souvenirArray);
-                souvenirArray.add(mapper.valueToTree(souvenir));
-            }
+            updateSouvenir(souvenir, souvenirArray);
         }
         souvenirDocument.saveRecords(souvenirArray);
+    }
+
+    private void updateSouvenir(Souvenir souvenir, ArrayNode souvenirArray) {
+        Optional<Souvenir> saved = getById(souvenir.getId());
+//        Souvenir toSave = new Souvenir();
+        if (saved.isPresent()){
+            if (souvenir.getName() == null) {
+                souvenir.setName(saved.get().getName());
+            }
+            if (souvenir.getPrice() == 0) {
+                souvenir.setPrice(saved.get().getPrice());
+            }
+            if (souvenir.getProductionDate() == null) {
+                souvenir.setProductionDate(saved.get().getProductionDate());
+            }
+            if (souvenir.getProducer() == null) {
+                souvenir.setProducer(saved.get().getProducer());
+            }
+            removeSouvenir(souvenir.getId(), souvenirArray);
+        }
+        souvenirArray.add(mapper.valueToTree(souvenir));
     }
 
 

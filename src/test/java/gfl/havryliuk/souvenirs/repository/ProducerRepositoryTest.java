@@ -60,8 +60,8 @@ public class ProducerRepositoryTest {
 
     @AfterMethod
     public void tearDown() {
-        PRODUCERS.deleteOnExit();
-        SOUVENIRS.deleteOnExit();
+//        PRODUCERS.deleteOnExit();
+//        SOUVENIRS.deleteOnExit();
     }
 
 
