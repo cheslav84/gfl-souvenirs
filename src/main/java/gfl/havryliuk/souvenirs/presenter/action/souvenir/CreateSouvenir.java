@@ -22,19 +22,17 @@ public class CreateSouvenir implements Action {
 
             String name = ConsoleReader.readString("souvenir name", ValidationPattern.NAME);
             double price = ConsoleReader.readDouble("the price", ValidationPattern.PRICE);
-            String datePatter = ConsoleReader.readString("production date in pattern yyyy-mm-dd",
+            String datePattern = ConsoleReader.readString("production date in pattern yyyy-mm-dd",
                     ValidationPattern.DATE);
-            LocalDateTime productionDate = LocalDateTime.parse(datePatter + "T00:00:00");
+            LocalDateTime productionDate = LocalDateTime.parse(datePattern + "T00:00:00");
 
             Souvenir souvenir = new Souvenir(name, price, productionDate, producer);
             SouvenirService service = new SouvenirService();
-            service.create(souvenir);//todo add souvenir to producer
+            service.create(souvenir);
             log.info("{} created.", souvenir);
-
         } else {
             log.warn("Producer hasn't been found.");
         }
-
 
     }
 }

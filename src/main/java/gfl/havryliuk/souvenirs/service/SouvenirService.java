@@ -27,7 +27,7 @@ public class SouvenirService {
     }
 
     public void update(Souvenir souvenir) {
-        System.out.println(souvenir + " updated");
+        souvenirRepository.save(souvenir);
     }
 
     public void create(Souvenir souvenir) {

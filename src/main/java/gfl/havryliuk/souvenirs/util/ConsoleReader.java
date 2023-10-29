@@ -58,6 +58,22 @@ public final class ConsoleReader {
         return Double.parseDouble(userInput);
     }
 
+    @SneakyThrows
+    public static double readForUpdatingDouble(double existedValue, String valueToRead, ValidationPattern pattern) {
+        log.debug("Enter {}, or press 0 to remain '{}' the same:", valueToRead, existedValue);
+        String userInput = readLine().replace(",", ".").trim();
+        while (!userInput.equals("0") && Validator.isNotValid(userInput, pattern.getPattern())) {
+            log.warn(capitalizeFirstLetter(valueToRead) + pattern.getErrorMessage());
+            log.debug("Enter {}:", valueToRead);
+            userInput = readLine().replace(",", ".").trim();
+        }
+        if (userInput.equals("0")) {
+            return existedValue;
+        }
+        return Double.parseDouble(userInput);
+    }
+
+
 //    public static LocalDateTime readDate(String valueToRead, ValidationPattern pattern) {
 //        log.debug("Enter {}:", valueToRead);
 //        String userInput = readLine().replace(",", ".").trim();
