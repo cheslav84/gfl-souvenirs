@@ -26,11 +26,9 @@ public class ProducerService {
 
     public void update(Producer producer){
         List<Souvenir> souvenirs = producer.getSouvenirs();
-
         for (Souvenir souvenir : souvenirs) {
             souvenir.setProducer(producer);
         }
-
         producerRepository.save(producer);
     }
 

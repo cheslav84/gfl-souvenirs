@@ -55,7 +55,6 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     private void updateSouvenir(Souvenir souvenir, ArrayNode souvenirArray) {
         Optional<Souvenir> saved = getById(souvenir.getId());
-//        Souvenir toSave = new Souvenir();
         if (saved.isPresent()){
             if (souvenir.getName() == null) {
                 souvenir.setName(saved.get().getName());

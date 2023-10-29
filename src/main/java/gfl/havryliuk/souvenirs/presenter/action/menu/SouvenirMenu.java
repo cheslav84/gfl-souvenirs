@@ -21,9 +21,9 @@ public class SouvenirMenu extends MenuTemplate {
     @AllArgsConstructor
     private enum ActionList implements MenuAction {
         EXIT("End the program", new Exit()),
-        CREATE_SOUVENIR("Create producer", new CreateSouvenir()),
-        UPDATE_SOUVENIR("Update producer", new UpdateSouvenir()),
-        DELETE_SOUVENIR("Delete producer", new DeleteSouvenir()),
+        CREATE_SOUVENIR("Create souvenir", new CreateSouvenir()),
+        UPDATE_SOUVENIR("Update souvenir", new UpdateSouvenir()),
+        DELETE_SOUVENIR("Delete souvenir", new DeleteSouvenir()),
         SELECT_OPTIONS("Select options", new SouvenirSelectMenu()),
         MAIN_MENU("Main menu", new MainMenu());
 

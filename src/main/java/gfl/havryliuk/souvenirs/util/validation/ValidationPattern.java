@@ -13,15 +13,10 @@ public enum ValidationPattern {
             " should be from 2 to 24 letters long, contains only letter, signs ' and - or space."),
     PRICE("^(\\d+(\\.\\d+)?)$", " should contains only digits and point."),
     PRODUCTION_YEAR("^((18)|(19)|(20))\\d\\d$", " should contains only four digits."),
-    DATE("^((18)|(19)|(20))\\d\\d-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))$", "");
-//    DATE("^(0[1-9]|[12][0-9]|3[01])[- /.](0[1-9]|1[012])[- /.](19|20)\\d\\d$", "");
+    DATE("^((18)|(19)|(20))\\d\\d-((0[1-9])|(1[012]))-((0[1-9])|([12][0-9])|(3[01]))$",
+            " is incorrect. Check pattern and try again.");
 
     private final String pattern;
     private final String errorMessage;
 
-
-//    ValidationPatterns(String pattern, String errorMessage) {
-//        this.pattern = pattern;
-//        this.errorMessage = errorMessage;
-//    }
 }

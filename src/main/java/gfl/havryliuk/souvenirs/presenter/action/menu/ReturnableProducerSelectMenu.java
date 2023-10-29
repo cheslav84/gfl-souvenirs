@@ -1,7 +1,8 @@
 package gfl.havryliuk.souvenirs.presenter.action.menu;
 
-import gfl.havryliuk.souvenirs.entities.Entity;
+import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
+import gfl.havryliuk.souvenirs.presenter.action.EmptyAction;
 import gfl.havryliuk.souvenirs.presenter.action.ReturnableAction;
 import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayAllProducers;
 import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayAllWithSouvenirs;
@@ -15,23 +16,23 @@ import java.util.List;
 import java.util.Optional;
 
 
-public class ReturnableProducerSelectMenu<T extends Entity> extends MenuTemplate implements ReturnableAction<Entity> {
-//public class ReturnableProducerSelectMenu<Optional<T extends Entity>> extends MenuTemplate implements ReturnableAction<Optional<Entity>> {
+public class ReturnableProducerSelectMenu extends MenuTemplate implements ReturnableAction<Producer>{
 
     public List<MenuAction> getActionList() {
         return Arrays.asList(ActionList.values());
     }
 
     @Override
-    public <T extends Entity> Optional<T> executeAndReturn() {
+    @SuppressWarnings("unchecked")
+    public Optional<Producer> executeAndReturn() {
         actionList = getActionList();
-        ReturnableAction action = (ReturnableAction) getAction(getMenuItems());
+        ReturnableAction<Producer> action = (ReturnableAction<Producer>) getAction(getMenuItems());
         return action.executeAndReturn();
     }
 
     @Getter
     @AllArgsConstructor
-    private enum ActionList implements MenuAction, ReturnableAction<Entity> {
+    private enum ActionList implements MenuAction, ReturnableAction<Producer> {
         ALL("Display all producers", new DisplayAllProducers()),
         ALL_WITH_SOUVENIRS("Display all producers with their souvenirs", new DisplayAllWithSouvenirs()),
         BY_PRICE_LESS_THAN("Display producers by price less than", new DisplayByPriceLessThan()),
@@ -44,10 +45,11 @@ public class ReturnableProducerSelectMenu<T extends Entity> extends MenuTemplate
             action.execute();
         }
 
-        public <T extends Entity> Optional<T> executeAndReturn() {
-            ReturnableAction returnableAction;
+        @SuppressWarnings("unchecked")
+        public Optional<Producer> executeAndReturn() {
+            ReturnableAction<Producer> returnableAction;
             if (action instanceof ReturnableAction){
-                returnableAction = (ReturnableAction) action;
+                returnableAction = (ReturnableAction<Producer>) action;
                 return returnableAction.executeAndReturn();
             }
             throw new UnsupportedOperationException();

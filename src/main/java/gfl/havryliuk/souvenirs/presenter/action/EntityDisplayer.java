@@ -9,7 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 import java.util.List;
 import java.util.Optional;
 
-@Slf4j
+    @Slf4j
     @Setter
     public abstract class EntityDisplayer implements Action, ReturnableAction<Entity> {//todo rename
 
@@ -24,9 +24,8 @@ import java.util.Optional;
 
     @Override
     public Optional<Entity> executeAndReturn() {
-        entities = setEntities();//todo обробити якщо не лист пустий
-        if(entities.size() != 0) {
-//            throw new IllegalArgumentException("The list is empty.");
+        entities = setEntities();
+        if(!entities.isEmpty()) {
             int userChoice = Menu.showEntitiesAndGetAnswer(entities, "To choose the producer press the number against it.");
             return Optional.of(entities.get(userChoice));
         } else {

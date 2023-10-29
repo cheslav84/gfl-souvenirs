@@ -17,7 +17,7 @@ public class UpdateProducer implements Action {
 
     @Override
     public void execute() {
-        Optional<Producer> producerOptional = new ReturnableProducerSelectMenu<Producer>().executeAndReturn();
+        Optional<Producer> producerOptional = new ReturnableProducerSelectMenu().executeAndReturn();
         if (producerOptional.isPresent()) {
             Producer producer = producerOptional.get();
 

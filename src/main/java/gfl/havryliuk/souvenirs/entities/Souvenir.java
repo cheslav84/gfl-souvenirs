@@ -64,9 +64,9 @@ public class Souvenir implements Entity {
     @Override
     public String toString() {
         return "Souvenir" +
-                " with name '" + name + '\'' +
+                " named '" + name + '\'' +
                 ", costs ₴" + price +
-                ", was produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\n";
+                ", produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\n";
     }
 }
 

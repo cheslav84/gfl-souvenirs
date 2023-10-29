@@ -1,6 +1,5 @@
 package gfl.havryliuk.souvenirs.presenter.action.producer;
 
-import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 import gfl.havryliuk.souvenirs.presenter.action.menu.ReturnableProducerSelectMenu;
@@ -15,14 +14,17 @@ import java.util.Optional;
 public class DeleteProducer implements Action {
     @Override
     public void execute() {
-        Optional<Producer> producerOptional = new ReturnableProducerSelectMenu<Producer>().executeAndReturn();
+        Optional<Producer> producerOptional = new ReturnableProducerSelectMenu().executeAndReturn();
         if (producerOptional.isPresent()) {
             Producer producer = producerOptional.get();
+
+            //todo confirm delete
+
             ProducerService service = new ProducerService();
             service.delete(producer);
             log.info("{} removed.", producer);
         } else {
-            log.info("Producer hasn't been found.");
+            log.warn("Producer hasn't been found.");
         }
     }
 }

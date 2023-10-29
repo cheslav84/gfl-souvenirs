@@ -72,6 +72,7 @@ public class SouvenirRepositoryTest {
 
         producerRepository.save(souvenir1.getProducer());
         producerRepository.save(souvenir2.getProducer());
+
         souvenirRepository.save(souvenir1);
         souvenirRepository.save(souvenir2);
 

@@ -55,7 +55,7 @@ public class Producer implements Entity {
     @Override
     public String toString() {
         return "Producer" +
-                " with name '" + name + '\'' +
+                " named '" + name + '\'' +
                 ", from '" + country + '\'';
     }
 }
