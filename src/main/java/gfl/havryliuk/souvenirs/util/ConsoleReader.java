@@ -47,7 +47,7 @@ public final class ConsoleReader {
 
 
     @SneakyThrows
-    public static double readDouble(String valueToRead, ValidationPattern pattern) {
+    public static double readDouble(String valueToRead, ValidationPattern pattern) {//todo багато повторюваного коду в методах
         log.debug("Enter {}:", valueToRead);
         String userInput = readLine().replace(",", ".").trim();
         while (Validator.isNotValid(userInput, pattern.getPattern())) {

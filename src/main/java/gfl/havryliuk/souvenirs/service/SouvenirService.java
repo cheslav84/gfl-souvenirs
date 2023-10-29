@@ -39,4 +39,10 @@ public class SouvenirService {
         souvenirs.add(souvenir);
         producerRepository.save(producer);
     }
+
+
+
+    public void delete(Souvenir souvenir) {
+        souvenirRepository.delete(souvenir.getId());
+    }
 }

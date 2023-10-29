@@ -31,7 +31,7 @@ public class CreateSouvenir implements Action {
             service.create(souvenir);
             log.info("{} created.", souvenir);
         } else {
-            log.warn("Producer hasn't been found.");
+            log.warn("Souvenir hasn't been found.");
         }
 
     }

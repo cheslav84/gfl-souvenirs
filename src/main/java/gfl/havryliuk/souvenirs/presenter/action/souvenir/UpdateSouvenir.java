@@ -3,7 +3,6 @@ package gfl.havryliuk.souvenirs.presenter.action.souvenir;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 import gfl.havryliuk.souvenirs.presenter.action.menu.ReturnableSouvenirSelectMenu;
-import gfl.havryliuk.souvenirs.service.ProducerService;
 import gfl.havryliuk.souvenirs.service.SouvenirService;
 import gfl.havryliuk.souvenirs.util.ConsoleReader;
 import gfl.havryliuk.souvenirs.util.validation.ValidationPattern;
@@ -40,7 +39,7 @@ public class UpdateSouvenir implements Action {
             service.update(souvenir);
             log.info("{} updated.", souvenir);
         } else {
-            log.info("Producer hasn't been found.");
+            log.info("Souvenir hasn't been found.");
         }
     }
 }
