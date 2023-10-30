@@ -10,6 +10,7 @@ import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
@@ -91,16 +92,34 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     }
 
-//    public List<Souvenir> getByProducer(Producer producer) {//change by name and country
-//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
-//                .map((node) -> mapper.mapEntity(node, Souvenir.class))
-//                .filter(s -> s.getProducer().getId().equals(producer.getId()))
-//                .collect(Collectors.toList());
-//    }
 
-    public List<Souvenir> getByProducerNameAndCountry(String name, String country) {//change by name and country
-        List<UUID> producersId = getProducersIdByNameAndCountry(name, country);
+    public List<Souvenir> getByProducerNameAndCountry(String name, String country) {
+        return findSouvenirs(findProducersIdByNameAndCountry(name, country));
+    }
 
+    public List<Souvenir> getByProducerCountry(String country) {
+        return findSouvenirs(findProducersIdByCountry(country));
+    }
+
+
+    private List<UUID> findProducersIdByNameAndCountry(String name, String country) {
+        return findProducersId(filterByNameAndCountry(name, country));
+    }
+
+    private List<UUID> findProducersIdByCountry(String country) {
+        return findProducersId(filterByCountry(country));
+    }
+
+    private static Predicate<Producer> filterByNameAndCountry(String name, String country) {
+        return p -> p.getName().equalsIgnoreCase(name) && p.getCountry().equals(country);
+    }
+
+    private static Predicate<Producer> filterByCountry(String country) {
+        return p -> p.getCountry().equalsIgnoreCase(country);
+    }
+
+
+    private List<Souvenir> findSouvenirs(List<UUID> producersId) {
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
                 .filter(s -> producersId.contains(s.getProducer().getId()))
@@ -109,29 +128,10 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
-    public List<Souvenir> getByCountry(String country) {
-        List<UUID> producersId = getProducersIdByCountry(country);
-
-        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(s -> producersId.contains(s.getProducer().getId()))
-                .distinct()
-                .collect(Collectors.toList());
-    }
-
-    private List<UUID> getProducersIdByCountry(String country) {
+    private List<UUID> findProducersId(Predicate<Producer> searchConditions) {
         return StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
-                .filter(p -> p.getCountry().equals(country))
-                .map(Producer::getId)
-                .collect(Collectors.toList());
-    }
-
-    private List<UUID> getProducersIdByNameAndCountry(String name, String country) {
-        return StreamSupport.stream(producerDocument.getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Producer.class))
-                .filter(p -> p.getName().equals(name))
-                .filter(p -> p.getCountry().equals(country))
+                .filter(searchConditions)
                 .map(Producer::getId)
                 .collect(Collectors.toList());
     }
@@ -153,7 +153,6 @@ public class SouvenirRepository implements Repository<Souvenir> {
             ArrayNode souvenirArray = souvenirDocument.getRecords();
             removeSouvenir(id, souvenirArray);
             souvenirDocument.saveRecords(souvenirArray);
-//            Document<Producer> producerDocument = producerRepository.getProducerDocument();
             ArrayNode producerArray = producerDocument.getRecords();
             removeSouvenirIdFromProducers(id, producerArray);
             producerDocument.saveRecords(producerArray);
@@ -188,8 +187,6 @@ public class SouvenirRepository implements Repository<Souvenir> {
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenirs(souvenirs, souvenirArray);
         souvenirDocument.saveRecords(souvenirArray);
-//        Document<Producer> producerDocument = producerRepository.getProducerDocument();
-
         ArrayNode producerArray = producerDocument.getRecords();
         removeAllSouvenirsIdFromProducers(souvenirs, producerArray);
         producerDocument.saveRecords(producerArray);

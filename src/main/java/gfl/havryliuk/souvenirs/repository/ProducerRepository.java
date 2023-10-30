@@ -74,7 +74,9 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
 
     //Вивести інформацію про виробників заданого сувеніру, виробленого у заданому року.
     public List<Producer> getProducersBySouvenirAndProductionYear(String souvenirName, String productionYear) {
+        Predicate<Producer> producerPredicate = filterBySouvenirNameAndProductionYear(souvenirName, productionYear);
         return findProducers(filterBySouvenirNameAndProductionYear(souvenirName, productionYear));
+//        return findProducers(filterBySouvenirNameAndProductionYear(souvenirName, productionYear));
     }
 
 
@@ -108,6 +110,7 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
     }
 
 
+
     private List<UUID> getProducersId(String name, String productionYear) {
         LocalDateTime year = LocalDateTime.parse(productionYear + "-01-01T00:00:00.00");
         return findProducersId(filterByNameAndYear(name, year));
@@ -123,7 +126,7 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
     }
 
     private Predicate<Souvenir> filterByNameAndYear(String name, LocalDateTime year) {
-        return s -> s.getName().equals(name) && s.getProductionDate().getYear() == year.getYear();
+        return s -> s.getName().equalsIgnoreCase(name) && s.getProductionDate().getYear() == year.getYear();
     }
 
 

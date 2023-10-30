@@ -344,7 +344,7 @@ public class SouvenirRepositoryTest {
 
         producerRepository.saveAll(producers);
 
-        assertThat(souvenirRepository.getByCountry(searchedCountry))
+        assertThat(souvenirRepository.getByProducerCountry(searchedCountry))
                 .isEqualTo(souvenirs);
     }
 

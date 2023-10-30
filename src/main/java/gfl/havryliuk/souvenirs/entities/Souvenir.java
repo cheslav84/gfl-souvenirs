@@ -66,7 +66,7 @@ public class Souvenir implements Entity {
         return "Souvenir" +
                 " named '" + name + '\'' +
                 ", costs ₴" + price +
-                ", produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE) + "\n";
+                ", produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
     }
 }
 
