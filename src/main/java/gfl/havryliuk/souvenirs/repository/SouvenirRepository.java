@@ -111,7 +111,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
     private static Predicate<Producer> filterByNameAndCountry(String name, String country) {
-        return p -> p.getName().equalsIgnoreCase(name) && p.getCountry().equals(country);
+        return p -> p.getName().equalsIgnoreCase(name) && p.getCountry().equalsIgnoreCase(country);
     }
 
     private static Predicate<Producer> filterByCountry(String country) {
