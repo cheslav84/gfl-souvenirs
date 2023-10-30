@@ -8,6 +8,7 @@ import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 
 import java.util.List;
+import java.util.Map;
 
 public class SouvenirService {
 
@@ -28,6 +29,14 @@ public class SouvenirService {
 
     public List<Souvenir> getByProducerNameAndCountry(String name, String country){
         return souvenirRepository.getByProducerNameAndCountry(name, country);
+    }
+
+    public List<Souvenir> getByProducerCountry(String country){
+        return souvenirRepository.getByProducerCountry(country);
+    }
+
+    public Map<Integer,List<Souvenir>> getGroupedByProductionYear(){
+        return souvenirRepository.getSouvenirsGropedByProductionYear();
     }
 
     public void update(Souvenir souvenir) {

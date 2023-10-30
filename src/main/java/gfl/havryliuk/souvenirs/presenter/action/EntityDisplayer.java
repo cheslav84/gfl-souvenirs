@@ -16,14 +16,14 @@ import java.util.Optional;
     protected List<? extends Entity> entities;
 
     @Override
-    public void execute() {
+    public void execute() {//todo порушує SingleResponcibility. Переробити якщо буде час.
         entities = setEntities();//todo обробити якщо не лист пустий
-        Menu.showEntities(entities);
+        Menu.showEntities(entities);//todo замінити наприклад на list displayer
         log.debug("\nMain menu.");
     }
 
     @Override
-    public Optional<Entity> executeAndReturn() {
+    public Optional<Entity> executeAndReturn() {//todo порушує SingleResponcibility. Переробити якщо буде час.
         entities = setEntities();
         if(!entities.isEmpty()) {
             int userChoice = Menu.showEntitiesAndGetAnswer(entities, "To choose the producer press the number against it.");
