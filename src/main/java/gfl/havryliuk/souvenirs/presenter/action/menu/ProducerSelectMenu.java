@@ -21,7 +21,7 @@ public class ProducerSelectMenu extends MenuTemplate {
     private enum ActionList implements MenuAction {
         EXIT("End the program", new Exit()),
         ALL("Display all producers", new DisplayAllProducers()),
-        ALL_WITH_SOUVENIRS("Display all producers with their souvenirs", new DisplayAllWithSouvenirs()),
+        ALL_WITH_SOUVENIRS("Display all producers with their souvenirs", new DisplayAllProducersWithSouvenirs()),
         BY_PRICE_LESS_THAN("Display producers by price less than", new DisplayByPriceLessThan()),
         DELETE_PRODUCER("Display producers by souvenir and production year", new DisplayBySouvenirAndProductionYear()),
         PRODUCER_MENU("Producer menu", new ProducerMenu()),

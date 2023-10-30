@@ -31,6 +31,7 @@ public class SouvenirPrinter<T> extends ConsoleLoggingPrinter<Souvenir> {
     @Override
     public StringBuilder getString(StringBuilder sb, List<Souvenir> souvenirs) {
 
+
         List<Integer> tableColumnsLength = new ArrayList<>();
         tableColumnsLength.add(getColumnLength(souvenirs, getNameFieldLength()));
         tableColumnsLength.add(getColumnLength(souvenirs, getPriceFieldLength()));
