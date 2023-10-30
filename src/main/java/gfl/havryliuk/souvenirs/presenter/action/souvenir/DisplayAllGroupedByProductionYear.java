@@ -2,44 +2,47 @@ package gfl.havryliuk.souvenirs.presenter.action.souvenir;
 
 import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
+import gfl.havryliuk.souvenirs.entities.dto.SouvenirsGroupedByProductionYearDto;
+import gfl.havryliuk.souvenirs.presenter.Menu;
 import gfl.havryliuk.souvenirs.presenter.action.EntityDisplayer;
 import gfl.havryliuk.souvenirs.presenter.printer.ConsoleLoggingPrinter;
+import gfl.havryliuk.souvenirs.presenter.printer.SouvenirPrinter;
 import gfl.havryliuk.souvenirs.service.SouvenirService;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class DisplayAllGroupedByProductionYear extends EntityDisplayer {
+public class DisplayAllGroupedByProductionYear extends EntityDisplayer<Souvenir> {
 
-    private Map<Integer,List<Souvenir>> souvenirs;
     @Override
     protected List<? extends Entity> setEntities() {
-        souvenirs = new SouvenirService().getGroupedByProductionYear();
-        return souvenirs.entrySet().stream()
-                .flatMap(e -> e.getValue().stream())
+        return new SouvenirService().getGroupedByProductionYear();
+    }
+
+    @Override
+    protected ConsoleLoggingPrinter<Souvenir> setPrinter() {
+        return new SouvenirPrinter<>(entities);
+    }
+
+
+    @Override
+    public Optional<Entity> executeAndReturn() {
+        entities = setEntities();
+        List<SouvenirsGroupedByProductionYearDto> dto = (List<SouvenirsGroupedByProductionYearDto>)entities;
+        List<Souvenir> souvenirs = dto.stream()
+                .flatMap(ls -> ls.getSouvenirs().stream())
                 .collect(Collectors.toList());
+        if(!souvenirs.isEmpty()) {
+            int userChoice = Menu.showEntitiesAndGetAnswer(souvenirs,
+                    "To choose the producer press the number against it.");
+            return Optional.of(souvenirs.get(userChoice));
+        } else {
+            return Optional.empty();
+        }
     }
 
-    @Override
-    protected ConsoleLoggingPrinter<? extends Entity> setPrinter() {
-        return null;
-    }
-
-    @Override
-    public void execute() {
-        setEntities();
-        souvenirs.entrySet().forEach(this::DisplayEntry);
-        log.debug("\nMain menu.");
-    }
-
-
-    private void DisplayEntry(Map.Entry<Integer, List<Souvenir>> entry) {
-        Integer year = entry.getKey();
-        List<Souvenir> souvenirList = entry.getValue();
-        log.info("In {} was produced:", year);
-        log.info("{}", souvenirList);
-    }
 }

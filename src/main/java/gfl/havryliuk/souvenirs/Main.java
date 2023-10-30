@@ -1,5 +1,6 @@
 package gfl.havryliuk.souvenirs;
 
+import gfl.havryliuk.souvenirs.presenter.action.menu.MainMenu;
 import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayAllProducersWithSouvenirs;
 import lombok.extern.slf4j.Slf4j;
 
@@ -18,14 +19,14 @@ public class Main {
 //        new DeleteProducer().execute();
 
 
-//        try {
-////            new InitMenu().execute();
-//            while (true) {
-//                new MainMenu().execute();
-//            }
-//        } catch (Exception e) {
-//            showMessage();
-//        }
+        try {
+//            new InitMenu().execute();
+            while (true) {
+                new MainMenu().execute();
+            }
+        } catch (Exception e) {
+            showMessage();
+        }
 
 //        List<Producer> producers = new ProducerService().getAll();
 //        ConsoleLoggingPrinter<Producer> printer = new ProducerPrinter<>(producers);

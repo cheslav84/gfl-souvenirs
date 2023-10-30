@@ -100,6 +100,10 @@
 списком сувенірів.
 
 
+
+
+![alt text](src\main\resources\picture\example.png "Приклад таблиці")
+
 #### Композиція
 Об'єкт ***Souvenir*** не може існувати без об'єкту ***Producer***. При видаленні ***Producer*** видаляються і його
 ***Souvenir***.

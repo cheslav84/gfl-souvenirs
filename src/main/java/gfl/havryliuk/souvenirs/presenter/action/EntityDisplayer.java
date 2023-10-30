@@ -33,7 +33,8 @@ import java.util.Optional;
     public Optional<Entity> executeAndReturn() {//todo порушує SingleResponsibility?. Подумати, можливо переробити якщо буде час.
         entities = setEntities();
         if(!entities.isEmpty()) {
-            int userChoice = Menu.showEntitiesAndGetAnswer(entities, "To choose the producer press the number against it.");
+            int userChoice = Menu.showEntitiesAndGetAnswer(entities,
+                    "To choose the producer press the number against it.");
             return Optional.of(entities.get(userChoice));
         } else {
             return Optional.empty();

@@ -146,6 +146,13 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
+//    public SouvenirsGroupedByProductionYear getSouvenirsGropedByProductionYearDto() {
+//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+//                .map((node) -> mapper.mapEntity(node, SouvenirsGroupedByProductionYear.class))
+//                .collect(Collectors.groupingBy(s -> s.getProductionDate().getYear()));
+//    }
+
+
     @Override
     public void delete(UUID id) {
         Optional<Souvenir> souvenirToDelete = getById(id);
