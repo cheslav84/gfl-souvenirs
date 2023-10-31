@@ -15,10 +15,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class DisplayAllGroupedByProductionYear extends EntityDisplayer<Souvenir> {
+public class DisplayAllGroupedByProductionYear extends EntityDisplayer<SouvenirsByYearDto> {
 
     @Override
-    protected List<? extends Entity> setEntities() {
+    protected List<SouvenirsByYearDto> setEntities() {
         return new SouvenirService().getGroupedByProductionYear();
     }
 

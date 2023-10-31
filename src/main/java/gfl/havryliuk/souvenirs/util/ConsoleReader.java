@@ -4,11 +4,9 @@ import gfl.havryliuk.souvenirs.util.validation.ValidationPattern;
 import gfl.havryliuk.souvenirs.util.validation.Validator;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.time.LocalDateTime;
 
 @Slf4j
 public final class ConsoleReader {
@@ -73,18 +71,6 @@ public final class ConsoleReader {
         return Double.parseDouble(userInput);
     }
 
-
-//    public static LocalDateTime readDate(String valueToRead, ValidationPattern pattern) {
-//        log.debug("Enter {}:", valueToRead);
-//        String userInput = readLine().replace(",", ".").trim();
-//        while (Validator.isNotValid(userInput, pattern.getPattern())) {
-//            log.warn(valueToRead + " " + pattern.getErrorMessage());
-//            log.debug("Enter {}:", valueToRead);
-//            userInput = readLine().replace(",", ".").trim();
-//        }
-//
-//        String userInput = readLine().replace(",", ".").trim();
-//    }
 
     private static String capitalizeFirstLetter(String valueToRead) {
         return valueToRead.substring(0, 1).toUpperCase() + valueToRead.substring(1);

@@ -14,7 +14,7 @@ import java.util.List;
 public class DisplayAllSouvenirs extends EntityDisplayer<Souvenir> {
 
     @Override
-    protected List<? extends Entity> setEntities() {
+    protected List<Souvenir> setEntities() {
         return new SouvenirService().getAll();
     }
 

@@ -2,7 +2,6 @@ package gfl.havryliuk.souvenirs.presenter.action.menu;
 
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 import gfl.havryliuk.souvenirs.presenter.action.EmptyAction;
-import gfl.havryliuk.souvenirs.presenter.action.Exit;
 import gfl.havryliuk.souvenirs.presenter.action.init.CreateStorage;
 import gfl.havryliuk.souvenirs.presenter.action.init.FillStorage;
 import lombok.AllArgsConstructor;

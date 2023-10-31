@@ -1,12 +1,10 @@
 package gfl.havryliuk.souvenirs.presenter.printer;
 
 import gfl.havryliuk.souvenirs.entities.Entity;
-import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
 import gfl.havryliuk.souvenirs.entities.dto.SouvenirsByYearDto;
 import lombok.extern.slf4j.Slf4j;
 
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Function;
@@ -16,7 +14,6 @@ import java.util.stream.Collectors;
 public class SouvenirsByYearPrinter<T> extends ConsoleLoggingPrinter<SouvenirsByYearDto> {
 
     public SouvenirsByYearPrinter(List<? extends Entity> entities) {
-//        super(entities);
         super((List<SouvenirsByYearDto>) entities);
     }
 

@@ -1,6 +1,5 @@
 package gfl.havryliuk.souvenirs.presenter.printer;
 
-import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +13,7 @@ import java.util.stream.Collectors;
 @Slf4j
 public class ProducerWithSouvenirsPrinter<T> extends ConsoleLoggingPrinter<Producer> {
 
-    public ProducerWithSouvenirsPrinter(List<? extends Entity> entities) {
-//        super(entities);
+    public ProducerWithSouvenirsPrinter(List<T> entities) {
         super((List<Producer>) entities);
     }
 

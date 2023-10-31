@@ -1,6 +1,5 @@
 package gfl.havryliuk.souvenirs.presenter.action.producer;
 
-import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.presenter.action.EntityDisplayer;
 import gfl.havryliuk.souvenirs.presenter.printer.ConsoleLoggingPrinter;
@@ -15,8 +14,8 @@ import java.util.List;
 public class DisplayAllProducersWithSouvenirs extends EntityDisplayer<Producer> {
 
     @Override
-    protected List<? extends Entity> setEntities() {
-        return  new ProducerService().getAllWithSouvenirs();
+    protected List<Producer> setEntities() {
+        return new ProducerService().getAllWithSouvenirs();
     }
 
     @Override

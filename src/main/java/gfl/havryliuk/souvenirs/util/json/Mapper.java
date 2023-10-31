@@ -6,9 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
-///**
-// * Згідно документації ObjectMapper важкий об'єкт - тому один на програму.
-// */
+
 public class Mapper extends ObjectMapper {
     private static Mapper mapper;
 
@@ -23,7 +21,6 @@ public class Mapper extends ObjectMapper {
         return mapper;
 
     }
-
 
     public <T> T mapEntity(JsonNode node, Class<T> valueType) {
         try {

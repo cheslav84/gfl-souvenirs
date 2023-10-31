@@ -3,7 +3,7 @@ package gfl.havryliuk.souvenirs.storage;
 
 import java.io.File;
 
-public class ProducerFileStorage implements FileStorage {//todo зробити абстрактним класом
+public class ProducerFileStorage implements FileStorage {
 
     public final String fileName = "Producers.json";
 

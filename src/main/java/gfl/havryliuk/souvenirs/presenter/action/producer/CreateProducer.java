@@ -2,7 +2,6 @@ package gfl.havryliuk.souvenirs.presenter.action.producer;
 
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
-import gfl.havryliuk.souvenirs.presenter.action.menu.ProducerMenu;
 import gfl.havryliuk.souvenirs.service.ProducerService;
 import gfl.havryliuk.souvenirs.util.ConsoleReader;
 import gfl.havryliuk.souvenirs.util.validation.ValidationPattern;

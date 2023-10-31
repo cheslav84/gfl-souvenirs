@@ -9,6 +9,7 @@ import lombok.extern.slf4j.Slf4j;
 public class Main {
 
 
+    @SuppressWarnings("InfiniteLoopStatement")
     public static void main(String[] args) {
         log.warn("Welcome to souvenir store!");
 

@@ -3,7 +3,6 @@ package gfl.havryliuk.souvenirs.presenter.printer;
 import gfl.havryliuk.souvenirs.entities.Entity;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +13,6 @@ import java.util.stream.Collectors;
 public class ProducerPrinter<T> extends ConsoleLoggingPrinter<Producer> {
 
     public ProducerPrinter(List<? extends Entity> entities) {
-//        super(entities);
         super((List<Producer>) entities);
     }
 
@@ -52,7 +50,6 @@ public class ProducerPrinter<T> extends ConsoleLoggingPrinter<Producer> {
     }
 
 
-
     private Function<Producer, Integer> getNameFieldLength() {
         return e -> (e.getName()).length();
     }
@@ -60,7 +57,5 @@ public class ProducerPrinter<T> extends ConsoleLoggingPrinter<Producer> {
     private Function<Producer, Integer> getCountryFieldLength() {
         return e -> (e.getCountry()).length();
     }
-
-
 
 }
