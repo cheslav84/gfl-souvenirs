@@ -6,15 +6,14 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Objects;
 import java.util.UUID;
 
 @Getter
 @Setter
 @NoArgsConstructor
-//@JsonIgnoreProperties(ignoreUnknown = true)
-
-public class Souvenir {
+public class Souvenir implements Entity {
     private UUID id;
 
     private String name;
@@ -23,11 +22,12 @@ public class Souvenir {
 
     private LocalDateTime productionDate;
 
-    @JsonIgnoreProperties(value = {"name", "country", "souvenirs" })
-    private Producer producer;
+    @JsonIgnoreProperties(value = {"country", "souvenirs" })
+//    @JsonIgnoreProperties(value = {"name", "country", "souvenirs" })
+    private Producer producer;//todo відображати ім'я
 
     public Souvenir(String name, double price, LocalDateTime productionDate, Producer producer) {
-        this.id = UUID.randomUUID();;
+        this.id = UUID.randomUUID();
         this.name = name;
         this.price = price;
         this.productionDate = productionDate;
@@ -61,4 +61,14 @@ public class Souvenir {
         result = 31 * result + (producer.getId() != null ? producer.getId().hashCode() : 0);
         return result;
     }
+
+    @Override
+    public String toString() {
+        return "Souvenir" +
+                " named '" + name + '\'' +
+                ", costs ₴" + price +
+                ", produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE) +
+                " by '" + producer.getName() + "'";
+    }
 }
+

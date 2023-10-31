@@ -6,7 +6,6 @@ import gfl.havryliuk.souvenirs.entities.Souvenir;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 public class SouvenirProvider {
 
@@ -26,13 +25,6 @@ public class SouvenirProvider {
     public static Souvenir getSouvenir(Producer producer) {
         return new Souvenir("Tea cup",80.99,  LocalDateTime.parse("2014-12-30T00:00:00"), producer);
     }
-
-//
-//    public static Souvenir getSouvenirWithOnlyId() {
-//        Souvenir souvenir = new Souvenir();
-//        souvenir.setId(UUID.randomUUID());
-//        return souvenir;
-//    }
 
     public static List<Souvenir> getSouvenirsWithProducer(int number) {
         Producer producer = ProducerProvider.getProducer();

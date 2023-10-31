@@ -4,23 +4,25 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
+import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 import gfl.havryliuk.souvenirs.util.json.Document;
 import gfl.havryliuk.souvenirs.util.json.Mapper;
 
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class SouvenirRepository implements Repository<Souvenir> {
     private final Mapper mapper;
-    private final ProducerRepository producerRepository;
     private final Document<Souvenir> souvenirDocument;
+    private final Document<Producer> producerDocument;
 
-    public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerRepository producerRepository) {
+    public SouvenirRepository(SouvenirFileStorage souvenirStorage, ProducerFileStorage producerStorage) {
         this.mapper = Mapper.getMapper();
-        this.producerRepository = producerRepository;
         this.souvenirDocument = new Document<>(souvenirStorage);
+        this.producerDocument = new Document<>(producerStorage);
     }
 
     Document<Souvenir> getSouvenirDocument() {
@@ -33,6 +35,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenir(souvenir.getId(), souvenirArray);
         souvenirArray.add(mapper.valueToTree(souvenir));
+        updateSouvenir(souvenir, souvenirArray);
         souvenirDocument.saveRecords(souvenirArray);
     }
 
@@ -44,11 +47,31 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
         checkIfAllProducersSaved(producerIdToStore);
         ArrayNode souvenirArray = souvenirDocument.getRecords();
-        removeSouvenirs(souvenirs, souvenirArray);//todo подумати, може не видаляти а замінювати,
+
         for (Souvenir souvenir : souvenirs) {
-            souvenirArray.add(mapper.valueToTree(souvenir));
+            updateSouvenir(souvenir, souvenirArray);
         }
         souvenirDocument.saveRecords(souvenirArray);
+    }
+
+    private void updateSouvenir(Souvenir souvenir, ArrayNode souvenirArray) {
+        Optional<Souvenir> saved = getById(souvenir.getId());
+        if (saved.isPresent()){
+            if (souvenir.getName() == null) {
+                souvenir.setName(saved.get().getName());
+            }
+            if (souvenir.getPrice() == 0) {
+                souvenir.setPrice(saved.get().getPrice());
+            }
+            if (souvenir.getProductionDate() == null) {
+                souvenir.setProductionDate(saved.get().getProductionDate());
+            }
+            if (souvenir.getProducer() == null) {
+                souvenir.setProducer(saved.get().getProducer());
+            }
+            removeSouvenir(souvenir.getId(), souvenirArray);
+        }
+        souvenirArray.add(mapper.valueToTree(souvenir));
     }
 
 
@@ -70,31 +93,49 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
-    public List<Souvenir> getByProducer(Producer producer) {
-        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
-                .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(s -> s.getProducer().getId().equals(producer.getId()))
-                .collect(Collectors.toList());
+    public List<Souvenir> getByProducerNameAndCountry(String name, String country) {
+        return findSouvenirs(findProducersIdByNameAndCountry(name, country));
     }
 
-    public List<Souvenir> getByCountry(String country) {
-        List<UUID> producersIdByCountry = getProducersIdByCountry(country);
+    public List<Souvenir> getByProducerCountry(String country) {
+        return findSouvenirs(findProducersIdByCountry(country));
+    }
 
+
+    private List<UUID> findProducersIdByNameAndCountry(String name, String country) {
+        return findProducersId(filterByNameAndCountry(name, country));
+    }
+
+    private List<UUID> findProducersIdByCountry(String country) {
+        return findProducersId(filterByCountry(country));
+    }
+
+    private static Predicate<Producer> filterByNameAndCountry(String name, String country) {
+        return p -> p.getName().equalsIgnoreCase(name) && p.getCountry().equalsIgnoreCase(country);
+    }
+
+    private static Predicate<Producer> filterByCountry(String country) {
+        return p -> p.getCountry().equalsIgnoreCase(country);
+    }
+
+
+    private List<Souvenir> findSouvenirs(List<UUID> producersId) {
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
-                .filter(s -> producersIdByCountry.contains(s.getProducer().getId()))
+                .filter(s -> producersId.contains(s.getProducer().getId()))
                 .distinct()
                 .collect(Collectors.toList());
     }
 
-    private List<UUID> getProducersIdByCountry(String country) {
-        return StreamSupport.stream(producerRepository.getProducerDocument().getSpliterator(), false)
+
+    private List<UUID> findProducersId(Predicate<Producer> searchConditions) {
+        return StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
-                .filter(p -> p.getCountry().equals(country))
+                .filter(searchConditions)
                 .map(Producer::getId)
                 .collect(Collectors.toList());
-
     }
+
 
 //    - Для кожного року вивести список сувенірів, зроблених цього року.
 
@@ -105,6 +146,13 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
+//    public SouvenirsGroupedByProductionYear getSouvenirsGropedByProductionYearDto() {
+//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
+//                .map((node) -> mapper.mapEntity(node, SouvenirsGroupedByProductionYear.class))
+//                .collect(Collectors.groupingBy(s -> s.getProductionDate().getYear()));
+//    }
+
+
     @Override
     public void delete(UUID id) {
         Optional<Souvenir> souvenirToDelete = getById(id);
@@ -112,7 +160,6 @@ public class SouvenirRepository implements Repository<Souvenir> {
             ArrayNode souvenirArray = souvenirDocument.getRecords();
             removeSouvenir(id, souvenirArray);
             souvenirDocument.saveRecords(souvenirArray);
-            Document<Producer> producerDocument = producerRepository.getProducerDocument();
             ArrayNode producerArray = producerDocument.getRecords();
             removeSouvenirIdFromProducers(id, producerArray);
             producerDocument.saveRecords(producerArray);
@@ -147,9 +194,6 @@ public class SouvenirRepository implements Repository<Souvenir> {
         ArrayNode souvenirArray = souvenirDocument.getRecords();
         removeSouvenirs(souvenirs, souvenirArray);
         souvenirDocument.saveRecords(souvenirArray);
-
-        Document<Producer> producerDocument = producerRepository.getProducerDocument();
-
         ArrayNode producerArray = producerDocument.getRecords();
         removeAllSouvenirsIdFromProducers(souvenirs, producerArray);
         producerDocument.saveRecords(producerArray);
@@ -213,14 +257,15 @@ public class SouvenirRepository implements Repository<Souvenir> {
 
     private void checkIfAllProducersSaved(UUID... idArr) {
         List<UUID> uuidList = new ArrayList<>(Arrays.stream(idArr).toList());
-        List<UUID> storedProducersId = StreamSupport.stream(producerRepository.getProducerDocument().getSpliterator(), false)
+        List<UUID> storedProducersId = StreamSupport.stream(producerDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Producer.class))
                 .map(Producer::getId)
                 .toList();
 
         for (UUID producerId : uuidList) {
             if (!storedProducersId.contains(producerId)) {
-                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: " + producerId);//todo не зовсім вірно подумати як переробити
+                throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: "
+                        + producerId);//todo не зовсім вірно подумати як переробити
             }
         }
     }

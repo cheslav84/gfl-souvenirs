@@ -4,7 +4,7 @@ package gfl.havryliuk.souvenirs.storage;
 import java.io.File;
 
 public class SouvenirFileStorage implements FileStorage {
-    public final String fileName = "Producers.json";
+    public final String fileName = "Souvenirs.json";
 
     private final File souvenirStorage;
 
