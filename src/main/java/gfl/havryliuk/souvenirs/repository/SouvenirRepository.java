@@ -137,20 +137,11 @@ public class SouvenirRepository implements Repository<Souvenir> {
     }
 
 
-//    - Для кожного року вивести список сувенірів, зроблених цього року.
-
     public Map<Integer, List<Souvenir>> getSouvenirsGropedByProductionYear() {
         return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
                 .map((node) -> mapper.mapEntity(node, Souvenir.class))
                 .collect(Collectors.groupingBy(s -> s.getProductionDate().getYear()));
     }
-
-
-//    public SouvenirsGroupedByProductionYear getSouvenirsGropedByProductionYearDto() {
-//        return StreamSupport.stream(souvenirDocument.getSpliterator(), false)
-//                .map((node) -> mapper.mapEntity(node, SouvenirsGroupedByProductionYear.class))
-//                .collect(Collectors.groupingBy(s -> s.getProductionDate().getYear()));
-//    }
 
 
     @Override
@@ -265,7 +256,7 @@ public class SouvenirRepository implements Repository<Souvenir> {
         for (UUID producerId : uuidList) {
             if (!storedProducersId.contains(producerId)) {
                 throw new IllegalStateException("Producer hasn't saved in storage. Save producer first. Producer id: "
-                        + producerId);//todo не зовсім вірно подумати як переробити
+                        + producerId);
             }
         }
     }

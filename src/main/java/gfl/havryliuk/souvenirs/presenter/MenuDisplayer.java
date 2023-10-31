@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Slf4j
-public class Menu {
+public class MenuDisplayer {
 
     @SneakyThrows
     public static int showItemsAndGetAnswer(List<String> items) {
@@ -35,16 +35,6 @@ public class Menu {
         }
         log.debug("{}", message);
         return showItemsAndGetAnswer(items);
-    }
-
-
-    public static void showEntities(List<? extends Entity> entities) {
-        log.debug("{}", entities);
-//        List<String> items = new ArrayList<>();
-//        for (int i = 0; i < entities.size(); i++) {
-//            items.add(i, entities.get(i).toString());
-//        }
-//        buildOptions(items);
     }
 
 

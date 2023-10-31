@@ -36,9 +36,6 @@ public class SouvenirService {
         return souvenirRepository.getByProducerCountry(country);
     }
 
-//    public Map<Integer,List<Souvenir>> getGroupedByProductionYear(){
-//        return souvenirRepository.getSouvenirsGropedByProductionYear();
-//    }
 
     public List<SouvenirsByYearDto> getGroupedByProductionYear(){
         return souvenirRepository.getSouvenirsGropedByProductionYear().entrySet().stream()

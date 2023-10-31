@@ -17,7 +17,7 @@ import java.util.List;
 public class DisplayByPriceLessThan extends EntityDisplayer<Producer> {
 
     @Override
-    protected List<? extends Entity> setEntities() {
+    protected List<Producer> setEntities() {
         double price = ConsoleReader.readDouble("the price", ValidationPattern.PRICE);
         return new ProducerService().getByPriceLessThan(price);
     }

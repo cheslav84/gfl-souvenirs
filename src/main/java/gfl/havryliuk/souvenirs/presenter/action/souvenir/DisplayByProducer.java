@@ -16,7 +16,7 @@ import java.util.List;
 public class DisplayByProducer extends EntityDisplayer<Souvenir> {
 
     @Override
-    protected List<? extends Entity> setEntities() {
+    protected List<Souvenir> setEntities() {
         String name = ConsoleReader.readString("producer name", ValidationPattern.NAME);
         String country = ConsoleReader.readString("producer country", ValidationPattern.COUNTRY);
         return new SouvenirService().getByProducerNameAndCountry(name, country);

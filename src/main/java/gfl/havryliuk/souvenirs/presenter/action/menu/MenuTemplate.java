@@ -1,6 +1,6 @@
 package gfl.havryliuk.souvenirs.presenter.action.menu;
 
-import gfl.havryliuk.souvenirs.presenter.Menu;
+import gfl.havryliuk.souvenirs.presenter.MenuDisplayer;
 import gfl.havryliuk.souvenirs.presenter.action.Action;
 
 import java.util.List;
@@ -25,7 +25,7 @@ public abstract class MenuTemplate implements Action {
     }
 
     public Action getAction(List<String> menuItems) {
-        return actionList.get(Menu.showItemsAndGetAnswer(menuItems));
+        return actionList.get(MenuDisplayer.showItemsAndGetAnswer(menuItems));
     }
 
 }

@@ -1,7 +1,6 @@
 package gfl.havryliuk.souvenirs.presenter.printer;
 
 import gfl.havryliuk.souvenirs.entities.Entity;
-import gfl.havryliuk.souvenirs.entities.Producer;
 import lombok.Setter;
 import org.apache.logging.log4j.util.Strings;
 

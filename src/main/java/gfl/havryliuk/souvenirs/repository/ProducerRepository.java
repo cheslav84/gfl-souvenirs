@@ -74,9 +74,7 @@ public class ProducerRepository implements Repository<Producer> {//todo поду
 
     //Вивести інформацію про виробників заданого сувеніру, виробленого у заданому року.
     public List<Producer> getProducersBySouvenirAndProductionYear(String souvenirName, String productionYear) {
-        Predicate<Producer> producerPredicate = filterBySouvenirNameAndProductionYear(souvenirName, productionYear);
         return findProducers(filterBySouvenirNameAndProductionYear(souvenirName, productionYear));
-//        return findProducers(filterBySouvenirNameAndProductionYear(souvenirName, productionYear));
     }
 
 

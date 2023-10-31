@@ -16,7 +16,7 @@ import java.util.List;
 public class DisplayBySouvenirAndProductionYear extends EntityDisplayer<Producer> {
 
     @Override
-    protected List<? extends Entity> setEntities() {
+    protected List<Producer> setEntities() {
         String name = ConsoleReader.readString("souvenir name", ValidationPattern.NAME);
         String productionYear = ConsoleReader.readString("souvenir production year",
                 ValidationPattern.PRODUCTION_YEAR);
