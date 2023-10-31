@@ -15,22 +15,22 @@ public class Main {
     public static void main(String[] args) {
         log.warn("Welcome to souvenir store!");
 
-        new DisplayAllGroupedByProductionYear().execute();
+//        new DisplayAllGroupedByProductionYear().execute();
 //        new DisplayAllProducersWithSouvenirs().execute();
 //        new DisplayAllProducers().execute();
-        new DisplayAllSouvenirs().execute();
+//        new DisplayAllSouvenirs().execute();
 //        new DisplayAllWithSouvenirs().execute();
 //        new DeleteProducer().execute();
 
 
-//        try {
-//            new InitMenu().execute();
-//            while (true) {
-//                new MainMenu().execute();
-//            }
-//        } catch (Exception e) {
-//            showMessage();
-//        }
+        try {
+            new InitMenu().execute();
+            while (true) {
+                new MainMenu().execute();
+            }
+        } catch (Exception e) {
+            showMessage();
+        }
 
 //        List<Producer> producers = new ProducerService().getAll();
 //        ConsoleLoggingPrinter<Producer> printer = new ProducerPrinter<>(producers);
