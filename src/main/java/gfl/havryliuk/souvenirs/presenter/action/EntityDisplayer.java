@@ -1,7 +1,7 @@
 package gfl.havryliuk.souvenirs.presenter.action;
 
 import gfl.havryliuk.souvenirs.entities.Entity;
-import gfl.havryliuk.souvenirs.presenter.Menu;
+import gfl.havryliuk.souvenirs.presenter.MenuDisplayer;
 
 import gfl.havryliuk.souvenirs.presenter.printer.ConsoleLoggingPrinter;
 import lombok.Setter;
@@ -33,7 +33,7 @@ import java.util.Optional;
     public Optional<Entity> executeAndReturn() {//todo порушує SingleResponsibility?. Подумати, можливо переробити якщо буде час.
         entities = setEntities();
         if(!entities.isEmpty()) {
-            int userChoice = Menu.showEntitiesAndGetAnswer(entities,
+            int userChoice = MenuDisplayer.showEntitiesAndGetAnswer(entities,
                     "To choose the producer press the number against it.");
             return Optional.of(entities.get(userChoice));
         } else {
