@@ -13,7 +13,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class SouvenirsGroupedByProductionYearDto implements Entity {
+public class SouvenirsByYearDto implements Entity {
 
     private int productionYear;
 

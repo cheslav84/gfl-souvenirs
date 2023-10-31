@@ -33,13 +33,13 @@ public class ProducerPrinter<T> extends ConsoleLoggingPrinter<Producer> {
         tableColumnsLength.add(getColumnLength(producers, getNameFieldLength()));
         tableColumnsLength.add(getColumnLength(producers, getCountryFieldLength()));
 
-        String tableLength = getTableRowLine(getTableLength(tableColumnsLength));
+        String rowLine = getTableRowLine(getTableLength(tableColumnsLength));
 
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
         sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", "Name"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(1) + "s|", "Country"));
         sb.append("\n");
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
 
         sb.append(producers.stream().map(p -> {
             sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", p.getName() + " "));
@@ -47,7 +47,7 @@ public class ProducerPrinter<T> extends ConsoleLoggingPrinter<Producer> {
             sb.append("\n");
             return "";
         }).collect(Collectors.joining()));
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
         return sb;
     }
 

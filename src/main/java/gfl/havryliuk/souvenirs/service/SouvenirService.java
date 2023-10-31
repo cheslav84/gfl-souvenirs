@@ -2,15 +2,13 @@ package gfl.havryliuk.souvenirs.service;
 
 import gfl.havryliuk.souvenirs.entities.Producer;
 import gfl.havryliuk.souvenirs.entities.Souvenir;
-import gfl.havryliuk.souvenirs.entities.dto.SouvenirsGroupedByProductionYearDto;
+import gfl.havryliuk.souvenirs.entities.dto.SouvenirsByYearDto;
 import gfl.havryliuk.souvenirs.repository.ProducerRepository;
 import gfl.havryliuk.souvenirs.repository.SouvenirRepository;
 import gfl.havryliuk.souvenirs.storage.ProducerFileStorage;
 import gfl.havryliuk.souvenirs.storage.SouvenirFileStorage;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class SouvenirService {
@@ -42,30 +40,15 @@ public class SouvenirService {
 //        return souvenirRepository.getSouvenirsGropedByProductionYear();
 //    }
 
-
-    public List<SouvenirsGroupedByProductionYearDto> getGroupedByProductionYear(){
-
-
-//        Map<Integer, List<Souvenir>> souvenirsGropedByProductionYear = souvenirRepository.getSouvenirsGropedByProductionYear();
-
-//        List<SouvenirsGroupedByProductionYearDto> souvenirList = new ArrayList<>();
-//        for (Map.Entry<Integer, List<Souvenir>> entry : souvenirsGropedByProductionYear.entrySet()) {
-//            SouvenirsGroupedByProductionYearDto souvenirs = new SouvenirsGroupedByProductionYearDto();
-//            souvenirs.setProductionYear(entry.getKey());
-//            souvenirs.setSouvenirs(entry.getValue());
-//            souvenirList.add(souvenirs);
-//        }
-
+    public List<SouvenirsByYearDto> getGroupedByProductionYear(){
         return souvenirRepository.getSouvenirsGropedByProductionYear().entrySet().stream()
                 .map(entry -> {
-                    SouvenirsGroupedByProductionYearDto souvenirs = new SouvenirsGroupedByProductionYearDto();
+                    SouvenirsByYearDto souvenirs = new SouvenirsByYearDto();
                     souvenirs.setProductionYear(entry.getKey());
                     souvenirs.setSouvenirs(entry.getValue());
                     return souvenirs;
                 })
                 .collect(Collectors.toList());
-
-//        return souvenirList;
     }
 
     public void update(Souvenir souvenir) {

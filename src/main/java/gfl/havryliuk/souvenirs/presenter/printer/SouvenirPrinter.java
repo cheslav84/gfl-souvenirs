@@ -37,14 +37,14 @@ public class SouvenirPrinter<T> extends ConsoleLoggingPrinter<Souvenir> {
         tableColumnsLength.add(getColumnLength(souvenirs, getPriceFieldLength()));
         tableColumnsLength.add(getColumnLength(souvenirs, getProductionDateFieldLength()));
 
-        String tableLength = getTableRowLine(getTableLength(tableColumnsLength));
+        String rowLine = getTableRowLine(getTableLength(tableColumnsLength));
 
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
         sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", "Name"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(1) + "s|", "Price"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(2) + "s|", "Produced"));
         sb.append("\n");
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
 
         sb.append(souvenirs.stream().map(p -> {
             sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", p.getName() + " "));
@@ -54,7 +54,7 @@ public class SouvenirPrinter<T> extends ConsoleLoggingPrinter<Souvenir> {
             sb.append("\n");
             return "";
         }).collect(Collectors.joining()));
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
         return sb;
     }
 

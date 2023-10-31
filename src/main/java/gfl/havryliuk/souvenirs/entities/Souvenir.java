@@ -23,7 +23,7 @@ public class Souvenir implements Entity {
     private LocalDateTime productionDate;
 
     @JsonIgnoreProperties(value = {"name", "country", "souvenirs" })
-    private Producer producer;
+    private Producer producer;//todo відображати ім'я
 
     public Souvenir(String name, double price, LocalDateTime productionDate, Producer producer) {
         this.id = UUID.randomUUID();

@@ -42,16 +42,16 @@ public class ProducerWithSouvenirsPrinter<T> extends ConsoleLoggingPrinter<Produ
         tableColumnsLength.add(getSouvenirsColumnLength(allSouvenirs, getPriceFieldLength()));
         tableColumnsLength.add(getSouvenirsColumnLength(allSouvenirs, getProductionDateFieldLength()));
 
-        String tableLength = getTableRowLine(getTableLength(tableColumnsLength));
+        String rowLine = getTableRowLine(getTableLength(tableColumnsLength));
 
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
         sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", "Name"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(1) + "s|", "Country"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(2) + "s|", "Souvenir name"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(3) + "s|", "Price"));
         sb.append(" ").append(String.format("%-" + tableColumnsLength.get(4) + "s|", "Produced"));
         sb.append("\n");
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
 
         sb.append(producers.stream().map(p -> {
             sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", p.getName() + " "));
@@ -71,7 +71,7 @@ public class ProducerWithSouvenirsPrinter<T> extends ConsoleLoggingPrinter<Produ
             sb.append("\n");
             return "";
         }).collect(Collectors.joining()));
-        sb.append(tableLength).append("\n");
+        sb.append(rowLine).append("\n");
         return sb;
     }
 
