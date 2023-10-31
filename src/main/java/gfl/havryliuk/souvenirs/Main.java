@@ -1,8 +1,10 @@
 package gfl.havryliuk.souvenirs;
 
+import gfl.havryliuk.souvenirs.presenter.action.menu.InitMenu;
 import gfl.havryliuk.souvenirs.presenter.action.menu.MainMenu;
 import gfl.havryliuk.souvenirs.presenter.action.producer.DisplayAllProducersWithSouvenirs;
 import gfl.havryliuk.souvenirs.presenter.action.souvenir.DisplayAllGroupedByProductionYear;
+import gfl.havryliuk.souvenirs.presenter.action.souvenir.DisplayAllSouvenirs;
 import lombok.extern.slf4j.Slf4j;
 
 
@@ -16,13 +18,13 @@ public class Main {
         new DisplayAllGroupedByProductionYear().execute();
 //        new DisplayAllProducersWithSouvenirs().execute();
 //        new DisplayAllProducers().execute();
-//        new DisplayAllSouvenirs().execute();
+        new DisplayAllSouvenirs().execute();
 //        new DisplayAllWithSouvenirs().execute();
 //        new DeleteProducer().execute();
 
 
 //        try {
-////            new InitMenu().execute();
+//            new InitMenu().execute();
 //            while (true) {
 //                new MainMenu().execute();
 //            }

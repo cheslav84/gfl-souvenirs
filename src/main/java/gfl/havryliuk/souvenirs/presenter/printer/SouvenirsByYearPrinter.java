@@ -40,7 +40,7 @@ public class SouvenirsByYearPrinter<T> extends ConsoleLoggingPrinter<SouvenirsBy
 
         tableColumnsLength.add(getSouvenirsColumnLength(allSouvenirs, getSouvenirNameFieldLength()));
         tableColumnsLength.add(getSouvenirsColumnLength(allSouvenirs, getPriceFieldLength()));
-//        tableColumnsLength.add(getSouvenirsColumnLength(allSouvenirs, getProductionDateFieldLength()));
+        tableColumnsLength.add(getSouvenirsColumnLength(allSouvenirs, getProducerNameFieldLength()));
 
         String rowLine = getTableRowLine(getTableLength(tableColumnsLength));
 
@@ -51,26 +51,26 @@ public class SouvenirsByYearPrinter<T> extends ConsoleLoggingPrinter<SouvenirsBy
             sb.append(rowLine).append("\n");
             sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", "Name"));
             sb.append(" ").append(String.format("%-" + tableColumnsLength.get(1) + "s|", "Price"));
+            sb.append(" ").append(String.format("%-" + tableColumnsLength.get(2) + "s|", "Producer"));
+            sb.append("\n");
+            sb.append(rowLine);
             List<Souvenir> souvenirs = sy.getSouvenirs();
-                sb.append(souvenirs.stream().map(s -> {
+            sb.append(souvenirs.stream().map(s -> {
                 sb.append("\n");
-                sb.append(rowLine).append("\n");
                 sb.append("| ").append(String.format("%-" + tableColumnsLength.get(0) + "s|", s.getName() + " "));
                 sb.append(" ").append(String.format("%-" + tableColumnsLength.get(1) + "s|", s.getPrice() + " "));
-
-//                sb.append(" ").append(String.format("%-" + tableColumnsLength.get(4) + "s|", s.getProductionDate()
-//                        .format(DateTimeFormatter.ISO_LOCAL_DATE) + " "));
+                sb.append(" ").append(String.format("%-" + tableColumnsLength.get(2) + "s|", s.getProducer().getName() + " "));
                 return "";
             }).collect(Collectors.joining()));
-                sb.append("\n").append(rowLine).append("\n");
+            sb.append("\n").append(rowLine).append("\n");
             return "";
         }).collect(Collectors.joining()));
         return sb;
     }
 
     private String formatYearRow(SouvenirsByYearDto sy, List<Integer> tableColumnsLength) {
-        return String.format("%-" + (getTableLength(tableColumnsLength) - tableColumnsLength.size() - 1)
-                + "s|", "Production year: " + sy.getProductionYear() + " ");
+        return String.format("%-" + (getTableLength(tableColumnsLength) - tableColumnsLength.size())
+                + "s|", "                         Production year: " + sy.getProductionYear() + " ");
     }
 
     private static Function<Souvenir, Integer> getSouvenirNameFieldLength() {
@@ -81,9 +81,9 @@ public class SouvenirsByYearPrinter<T> extends ConsoleLoggingPrinter<SouvenirsBy
         return e -> String.valueOf(e.getPrice()).length();
     }
 
-//    private static Function<Souvenir, Integer> getProductionDateFieldLength() {
-//        return e -> (e.getProductionDate().format(DateTimeFormatter.ISO_LOCAL_DATE)).length();
-//    }
+    private static Function<Souvenir, Integer> getProducerNameFieldLength() {
+        return e -> String.valueOf(e.getProducer().getName()).length();
+    }
 
     protected int getSouvenirsColumnLength(List<Souvenir> producers, Function<Souvenir, Integer> field) {
         return producers.stream()

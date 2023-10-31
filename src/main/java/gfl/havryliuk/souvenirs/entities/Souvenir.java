@@ -22,7 +22,8 @@ public class Souvenir implements Entity {
 
     private LocalDateTime productionDate;
 
-    @JsonIgnoreProperties(value = {"name", "country", "souvenirs" })
+    @JsonIgnoreProperties(value = {"country", "souvenirs" })
+//    @JsonIgnoreProperties(value = {"name", "country", "souvenirs" })
     private Producer producer;//todo відображати ім'я
 
     public Souvenir(String name, double price, LocalDateTime productionDate, Producer producer) {
@@ -66,7 +67,8 @@ public class Souvenir implements Entity {
         return "Souvenir" +
                 " named '" + name + '\'' +
                 ", costs ₴" + price +
-                ", produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE);
+                ", produced on " + productionDate.format(DateTimeFormatter.ISO_LOCAL_DATE) +
+                " by '" + producer.getName() + "'";
     }
 }
 
